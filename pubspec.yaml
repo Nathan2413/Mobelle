@@ -72,10 +72,13 @@ flutter:
     - images/pou5.jpg
     - images/pou5.jpeg
     - images/plan2.jpg
+    - images/bella.jpg
     - images/eau_vive.png
+    - images/bg.png
     - images/banane.png
     - images/oeuf.png
     - images/carton.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

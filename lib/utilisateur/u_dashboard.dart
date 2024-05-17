@@ -1,178 +1,163 @@
 import 'package:flutter/material.dart';
-import '../ecran.dart';
-import '../carte.dart';
+import '../ecran.dart'; // Importation de "../ecran.dart"
+import 'fako.dart'; // Importation de "../fako.dart"
 
 class UDashboard extends StatefulWidget {
-  const UDashboard({Key? key}) : super(key: key);
-
   @override
   _UDashboardState createState() => _UDashboardState();
 }
 
 class _UDashboardState extends State<UDashboard>
     with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _animation;
-
-  bool _isMenuOpen = false;
+  bool _showImage = false;
+  late AnimationController _controller;
+  late Animation<Offset> _animation;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: Duration(milliseconds: 500), // Durée de l'animation
     );
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
+    _animation = Tween<Offset>(
+      begin: Offset(0.0, 1.0), // Commence en bas de l'écran
+      end: Offset.zero, // Se termine en haut de l'écran
+    ).animate(_controller);
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _controller.dispose();
     super.dispose();
-  }
-
-  void _toggleMenu() {
-    setState(() {
-      _isMenuOpen = !_isMenuOpen;
-      if (_isMenuOpen) {
-        _animationController.forward();
-      } else {
-        _animationController.reverse();
-      }
-    });
-  }
-
-  void _navigateToCarte() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Carte()),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Mo Belle',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 93, 233, 98),
+        backgroundColor: const Color.fromARGB(255, 16, 165, 8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(10.0),
-            bottomRight: Radius.circular(10.0),
-          ),
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
         elevation: 4,
         shadowColor: Colors.grey[400],
-        leading: IconButton(
-          icon: AnimatedIcon(
-            icon: AnimatedIcons.menu_close,
-            progress: _animationController,
+        title: Center(
+          child: Text(
+            'Mo Belle',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: 24,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 2,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
           ),
-          onPressed: _toggleMenu,
+        ),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: Icon(Icons.exit_to_app),
             onPressed: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyApp(),
+                  builder: (context) =>
+                      MyApp(), // Redirection vers MyApp() de "../ecran.dart"
                 ),
               );
             },
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          Container(
-            child: Center(
-              child: Text('Contenu du tableau de bord utilisateur'),
-            ),
-          ),
-          Positioned(
-            top: kToolbarHeight,
-            left: 0,
-            right: 0,
-            height: MediaQuery.of(context).size.height - kToolbarHeight,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: Offset(-1.0, 0),
-                end: Offset(0, 0),
-              ).animate(_animation),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                decoration: BoxDecoration(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 93, 233, 98),
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10.0),
-                    topRight: Radius.circular(10.0),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      offset: Offset(0, 2),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-                child: ListView(
-                  children: [
-                    SizedBox(height: 16.0),
-                    ListTile(
-                      title: Text(
-                        'Poubelles',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      leading: Text(
-                        '🗑️', // Emoji pour la poubelle
-                        style: TextStyle(fontSize: 32),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    SizedBox(height: 16.0),
-                    ListTile(
-                      title: Text(
-                        'Carte',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      leading: Text(
-                        '🗺️', // Emoji pour la carte
-                        style: TextStyle(fontSize: 32),
-                        textAlign: TextAlign.center,
-                      ),
-                      onTap:
-                          _navigateToCarte, // Naviguer vers la page "Carte" lors du clic
-                    ),
-                  ],
+                  fontSize: 20,
                 ),
               ),
             ),
-          ),
-        ],
+            ListTile(
+              leading: Icon(Icons.delete),
+              title: Text('Poubelles'),
+              onTap: () {
+                setState(() {
+                  _showImage = false;
+                });
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.map),
+              title: Text('Carte'),
+              onTap: () {
+                setState(() {
+                  _showImage = true;
+                });
+                _controller.forward(); // Démarrer l'animation
+                Navigator.pop(context); // Ferme le rideau (drawer)
+              },
+            ),
+          ],
+        ),
+      ),
+      body: Container(
+        color: Colors.white, // Couleur de fond blanc
+        child: _showImage ? _buildImageWithAnimation() : FakoScreen(),
+      ),
+    );
+  }
+
+  Widget _buildImageWithAnimation() {
+    return SlideTransition(
+      position: _animation, // Appliquer l'animation de bas en haut
+      child: Padding(
+        padding: const EdgeInsets.only(top: 80.0), // Padding ajusté à 80
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Carte',
+                style: TextStyle(
+                  color:
+                      Colors.grey[700], // Couleur de texte gris professionnel
+                  fontSize: 36, // Taille de police 36
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            AspectRatio(
+              aspectRatio: 16 / 12,
+              child: Image.asset(
+                'images/plan2.jpg',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

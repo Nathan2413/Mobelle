@@ -1,0 +1,105 @@
+{
+  "project_info": {
+    "project_number": "656682489119",
+    "project_id": "mobelle-e1322",
+    "storage_bucket": "mobelle-e1322.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656682489119:android:4f432875f4cc2965df4c2a",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWW4iRdyvyPhsi3Fv91T-0MWGcY5N7kJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656682489119:android:48f0d1062d464933df4c2a",
+        "android_client_info": {
+          "package_name": "com.example.mau_belle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWW4iRdyvyPhsi3Fv91T-0MWGcY5N7kJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656682489119:android:fc7bd30303658485df4c2a",
+        "android_client_info": {
+          "package_name": "com.example.mo_belle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWW4iRdyvyPhsi3Fv91T-0MWGcY5N7kJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656682489119:android:a611fea1a1a75f73df4c2a",
+        "android_client_info": {
+          "package_name": "com.example.mobelle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWW4iRdyvyPhsi3Fv91T-0MWGcY5N7kJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656682489119:android:531b006015753483df4c2a",
+        "android_client_info": {
+          "package_name": "com.example.poubelle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWW4iRdyvyPhsi3Fv91T-0MWGcY5N7kJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

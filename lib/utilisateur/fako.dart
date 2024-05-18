@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'details.dart'; // Importez la page de détails
 
 class FakoScreen extends StatelessWidget {
   @override
@@ -52,9 +53,11 @@ class PoubellesList extends StatelessWidget {
         return ListView(
           children: snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+            String id = data['id']; // Récupérez l'ID depuis Firestore
             String nom = data['nom'];
             String localisation = data['localisation'];
             return PoubelleCard(
+              id: id, // Passez l'ID à la carte de poubelle
               nom: nom,
               localisation: localisation,
             );
@@ -66,17 +69,22 @@ class PoubellesList extends StatelessWidget {
 }
 
 class PoubelleCard extends StatelessWidget {
+  final String id; // Ajoutez l'ID
   final String nom;
   final String localisation;
 
-  PoubelleCard({required this.nom, required this.localisation});
+  PoubelleCard({
+    required this.id, // Ajoutez l'ID dans le constructeur
+    required this.nom,
+    required this.localisation,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
       margin: EdgeInsets.symmetric(vertical: 10.0),
-      color: Colors.grey[300], // Utilisation d'une teinte de gris neutre
+      color: Colors.grey[300],
       child: Padding(
         padding: EdgeInsets.all(10.0),
         child: Row(
@@ -94,7 +102,7 @@ class PoubelleCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.title, color: Colors.blue),
+                      Icon(Icons.person, color: Colors.blue),
                       SizedBox(width: 5.0),
                       Text(
                         nom,
@@ -126,20 +134,27 @@ class PoubelleCard extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Color.fromARGB(
-                            255, 16, 165, 8), // Couleur de fond du bouton
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Bordure arrondie
+                        color: Color.fromARGB(255, 16, 165, 8),
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: TextButton(
                         onPressed: () {
-                          // Action à effectuer lorsque le bouton est pressé
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailsPage(
+                                id: id, // Passez l'ID à la page des détails
+                                nom: nom,
+                                localisation: localisation,
+                              ),
+                            ),
+                          );
                         },
                         child: Text(
-                          'Details',
+                          'Détails',
                           style: TextStyle(
                             fontSize: 14.0,
-                            color: Colors.white, // Couleur du texte du bouton
+                            color: Colors.white,
                           ),
                         ),
                       ),

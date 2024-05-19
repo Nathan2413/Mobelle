@@ -66,16 +66,14 @@ class DetailsPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Container(
-              width: MediaQuery.of(context).size.width *
-                  0.9, // 90% de la largeur de l'écran
-              height: MediaQuery.of(context).size.height *
-                  0.3, // 30% de la hauteur de l'écran
+              width: MediaQuery.of(context).size.width * 0.9,
+              height: MediaQuery.of(context).size.height * 0.3,
               child: Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
                 ),
-                color: Colors.grey[300], // Couleur gris professionnel
+                color: Colors.grey[300],
                 child: Padding(
                   padding: EdgeInsets.all(20.0),
                   child: Row(
@@ -123,7 +121,9 @@ class DetailsPage extends StatelessWidget {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.info_outline),
+                                    SizedBox(width: 20),
+                                    Icon(Icons.info_outline,
+                                        color: Colors.blue),
                                     SizedBox(width: 10),
                                     Text(id,
                                         style: TextStyle(
@@ -134,7 +134,8 @@ class DetailsPage extends StatelessWidget {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    Icon(Icons.person, color: Colors.blue),
+                                    SizedBox(width: 20),
+                                    Icon(Icons.person, color: Colors.green),
                                     SizedBox(width: 10),
                                     Text(nom,
                                         style: TextStyle(
@@ -145,19 +146,21 @@ class DetailsPage extends StatelessWidget {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
+                                    SizedBox(width: 20),
                                     Icon(Icons.location_on, color: Colors.red),
                                     SizedBox(width: 10),
                                     Text(localisation,
                                         style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        )),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    Icon(Icons.line_weight),
+                                    SizedBox(width: 20),
+                                    Icon(Icons.line_weight,
+                                        color: Colors.orange),
                                     SizedBox(width: 10),
                                     Text('$poids kg',
                                         style: TextStyle(
@@ -168,13 +171,14 @@ class DetailsPage extends StatelessWidget {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    Icon(Icons.format_size, color: Colors.blue),
+                                    SizedBox(width: 20),
+                                    Icon(Icons.format_size,
+                                        color: Colors.purple),
                                     SizedBox(width: 10),
                                     Text('$volume m³',
                                         style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        )),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                               ],
@@ -189,7 +193,7 @@ class DetailsPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Spécifique',
@@ -199,6 +203,12 @@ class DetailsPage extends StatelessWidget {
                     color: Colors.grey,
                   ),
                 ),
+              ],
+            ),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 Text(
                   'Déchets',
                   style: TextStyle(
@@ -208,6 +218,22 @@ class DetailsPage extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Action à effectuer lorsque le bouton est pressé
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 16, 165, 8),
+              ),
+              child: Text(
+                'Voir les déchets',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
             ),
           ],
         ),

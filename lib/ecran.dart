@@ -92,25 +92,21 @@ class _MyHomePageState extends State<MyHomePage>
     final bool isWeb = MediaQuery.of(context).size.width > 800;
 
     return Scaffold(
-      appBar: null, // Supprime l'AppBar
+      appBar: null,
       body: Stack(
-        fit: StackFit.expand, // Ajuste l'image à la taille de l'écran
+        fit: StackFit.expand,
         children: [
           Image.asset(
-            'images/pou4.jpg', // Chemin de l'image de fond
-            fit: BoxFit.cover, // Ajuste l'image pour couvrir toute la surface
-            color:
-                const Color.fromARGB(136, 0, 0, 0), // Assombrir l'arrière-plan
-            colorBlendMode: BlendMode
-                .darken, // Mode de fusion pour assombrir l'arrière-plan
+            'images/pou4.jpg',
+            fit: BoxFit.cover,
+            color: const Color.fromARGB(136, 0, 0, 0),
+            colorBlendMode: BlendMode.darken,
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment
-                .center, // Centrez les éléments horizontalement
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              SizedBox(
-                  height: 24.0), // Ajout d'un espace entre l'AppBar et le titre
+              SizedBox(height: 24.0),
               Opacity(
                 opacity: _animation.value,
                 child: Transform.translate(
@@ -121,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage>
                       child: Column(
                         children: [
                           Text(
-                            isWeb ? 'Mo Belle' : 'Mo Belle', // Titre "Mo Belle"
+                            isWeb ? 'Mo Belle' : 'Mo Belle',
                             style: TextStyle(
                               fontSize: isWeb ? 100.0 : 40.0,
                               fontWeight: FontWeight.bold,
@@ -135,14 +131,12 @@ class _MyHomePageState extends State<MyHomePage>
                               ],
                             ),
                           ),
-                          if ((isMobile || isWeb) &&
-                              isWeb) // Afficher la ligne verte sur mobile et web
+                          if ((isMobile || isWeb) && isWeb)
                             Container(
-                              width: 100, // Largeur de la ligne verte
-                              height: 10, // Épaisseur de la ligne verte
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 8.0), // Marge verticale
-                              color: Colors.green, // Couleur de la ligne verte
+                              width: 100,
+                              height: 10,
+                              margin: EdgeInsets.symmetric(vertical: 8.0),
+                              color: Colors.green,
                             ),
                         ],
                       ),
@@ -150,8 +144,7 @@ class _MyHomePageState extends State<MyHomePage>
                   ),
                 ),
               ),
-              SizedBox(
-                  height: 32.0), // Ajout d'un espace entre le titre et le texte
+              SizedBox(height: 32.0),
               Opacity(
                 opacity: _animation.value,
                 child: Transform.translate(
@@ -161,12 +154,11 @@ class _MyHomePageState extends State<MyHomePage>
                     child: Text(
                       "Une route propre ne dépend pas seulement de l'efficacité du service de nettoyage, mais aussi de l'éducation des personnes qui y passent.",
                       textAlign: TextAlign.center,
-                      style: isMobile // Vérifie si c'est un appareil mobile
+                      style: isMobile
                           ? TextStyle(
-                              fontSize: 25.0, // Taille du texte principal
-                              color: Colors.white, // Couleur du texte principal
-                              fontStyle: FontStyle
-                                  .italic, // Style italique pour mobile
+                              fontSize: 25.0,
+                              color: Colors.white,
+                              fontStyle: FontStyle.italic,
                             )
                           : TextStyle(
                               fontSize: isWeb ? 60.0 : 25.0,
@@ -176,41 +168,35 @@ class _MyHomePageState extends State<MyHomePage>
                   ),
                 ),
               ),
-              SizedBox(
-                  height:
-                      60.0), // Ajout d'un espace entre le texte et le bouton
-              Opacity(
-                opacity: _animation.value,
-                child: Transform.translate(
-                  offset: Offset(0, -100 * (1 - _animation.value)),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => UDashboard()),
-                      );
-                    },
-                    child: Text(
-                      'Les poubelles disponibles',
-                      style: TextStyle(fontSize: isWeb ? 30.0 : 18.0),
+              SizedBox(height: 60.0),
+              if (!isWeb) // Afficher le bouton uniquement si ce n'est pas sur le web
+                Opacity(
+                  opacity: _animation.value,
+                  child: Transform.translate(
+                    offset: Offset(0, -100 * (1 - _animation.value)),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => UDashboard()),
+                        );
+                      },
+                      child: Text(
+                        'Les poubelles disponibles',
+                        style: TextStyle(fontSize: isWeb ? 30.0 : 18.0),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              if (!isMobile)
-                SizedBox(
-                    height:
-                        10.0), // Ajout d'un espace entre le bouton et le texte "Développeur"
+              if (!isMobile) SizedBox(height: 10.0),
               if (!isMobile)
                 Align(
-                  alignment: Alignment.bottomRight, // Aligner en bas à droite
+                  alignment: Alignment.bottomRight,
                   child: GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                Login()), // Naviguer vers login.dart
+                        MaterialPageRoute(builder: (context) => Login()),
                       );
                     },
                     child: Opacity(

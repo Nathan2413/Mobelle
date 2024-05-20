@@ -222,7 +222,7 @@ class DetailsPage extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Action à effectuer lorsque le bouton est pressé
+                _showDechetsAlert(context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color.fromARGB(255, 16, 165, 8),
@@ -238,6 +238,67 @@ class DetailsPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showDechetsAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Déchets'),
+          content: StreamBuilder(
+            stream:
+                FirebaseFirestore.instance.collection('dechets').snapshots(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return Text('Erreur: ${snapshot.error}');
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              }
+
+              List<Widget> images =
+                  snapshot.data!.docs.map((DocumentSnapshot document) {
+                Map<String, dynamic> data =
+                    document.data() as Map<String, dynamic>;
+                String imageName = data[
+                    'image']; // Changer ici selon la structure de votre base de données
+                String imageUrl = 'images/$imageName';
+                return Image.asset(
+                  imageUrl,
+                  width: 100,
+                  height: 100,
+                );
+              }).toList();
+
+              List<Widget> rows = [];
+              for (int i = 0; i < images.length; i += 2) {
+                List<Widget> rowChildren = [];
+                rowChildren.add(images[i]);
+                if (i + 1 < images.length) {
+                  rowChildren.add(images[i + 1]);
+                }
+                rows.add(Row(children: rowChildren));
+              }
+
+              return Column(
+                children: rows,
+              );
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

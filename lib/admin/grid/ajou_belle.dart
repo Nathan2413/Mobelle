@@ -40,10 +40,12 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
         'id': id,
         'nom': _nomController.text,
         'poids': double.parse(_poidsController.text),
-        'volume': double.parse(_volumeController.text), // Modifier en volume
-        'poids_utilise': 0, // Ajouter poids utilisé
-        'volume_utilise': 0, // Ajouter volume utilisé
+        'volume': double.parse(_volumeController.text),
+        'poids_utilise': 0,
+        'volume_utilise': 0,
         'localisation': _selectedLocalisation,
+        'dechets': '', // Champ de déchets vide par défaut
+        'acces': 'pokaty', // Par défaut, l'accès est "pokaty"
       }).then((value) {
         showDialog(
           context: context,
@@ -55,10 +57,9 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
                 TextButton(
                   child: Text('OK'),
                   onPressed: () {
-                    // Vider les champs de saisie et la localisation
                     _nomController.clear();
                     _poidsController.clear();
-                    _volumeController.clear(); // Vider aussi le champ de volume
+                    _volumeController.clear();
                     _selectedLocalisation = null;
                     Navigator.of(context).pop();
                   },

@@ -36,7 +36,10 @@ class PoubellesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('poubelles').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('poubelles')
+          .where('acces', isEqualTo: 'pokaty') // Filtrer par le champ acces
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Erreur: ${snapshot.error}');

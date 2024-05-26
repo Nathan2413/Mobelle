@@ -7,6 +7,8 @@ import 'grid/list_perso.dart';
 import 'grid/list_pou.dart';
 import 'grid/ajou_dcht.dart'; // Importer la page ajou_dcht.dart
 import 'grid/list_dcht.dart';
+import 'grid/dcht_vide.dart'; // Importer la page dcht_vide.dart
+import 'grid/dash.dart'; // Importer la page dash.dart
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -17,7 +19,13 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   Widget _currentWidget =
-      SizedBox(); // Widget actuel à afficher dans le côté droit
+      DashPage(); // Widget actuel à afficher dans le côté droit
+
+  @override
+  void initState() {
+    super.initState();
+    _currentWidget = DashPage(); // Initialiser avec dash.dart
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,17 +120,20 @@ class _DashboardState extends State<Dashboard> {
                     child: ListView(
                       padding: EdgeInsets.zero,
                       children: [
-                        Container(
-                          color: Color.fromARGB(255, 93, 233, 98),
-                          child: ListTile(
-                            leading: Icon(Icons.dashboard),
-                            title: Text(
-                              'Tableau de bord',
-                              style: TextStyle(
-                                fontSize: 20,
-                              ),
+                        ListTile(
+                          leading: Icon(Icons.dashboard),
+                          title: Text(
+                            'Tableau de bord',
+                            style: TextStyle(
+                              fontSize: 22,
                             ),
                           ),
+                          onTap: () {
+                            // Action lorsque "Tableau de bord" est tapé
+                            setState(() {
+                              _currentWidget = DashPage(); // Afficher dash.dart
+                            });
+                          },
                         ),
                         ExpansionTile(
                           leading: Icon(Icons.person),
@@ -210,7 +221,24 @@ class _DashboardState extends State<Dashboard> {
                                 // Action lorsque "Tous les poubelles" est tapé
                                 setState(() {
                                   _currentWidget =
-                                      ListPoubelles(); // Afficher la page ajout_belle.dart
+                                      ListPoubelles(); // Afficher la page list_pou.dart
+                                });
+                              },
+                            ),
+                            ListTile(
+                              contentPadding: EdgeInsets.only(left: 40),
+                              leading: Icon(Icons.delete_sweep),
+                              title: Text(
+                                'Poubelles à vider',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                              onTap: () {
+                                // Action lorsque "Poubelles à vider" est tapé
+                                setState(() {
+                                  _currentWidget =
+                                      ListPoubellesAVider(); // Afficher la page dcht_vide.dart
                                 });
                               },
                             ),
@@ -253,10 +281,10 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                               onTap: () {
-                                // Action lorsque "Ajouter un déchet" est tapé
+                                // Action lorsque "Tous les déchets" est tapé
                                 setState(() {
                                   _currentWidget =
-                                      ListDechets(); // Afficher la page ajou_dcht.dart
+                                      ListDechets(); // Afficher la page list_dcht.dart
                                 });
                               },
                             ),

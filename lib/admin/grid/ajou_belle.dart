@@ -21,8 +21,7 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nomController = TextEditingController();
   final TextEditingController _poidsController = TextEditingController();
-  final TextEditingController _volumeController =
-      TextEditingController(); // Renommer en volume
+  final TextEditingController _volumeController = TextEditingController();
   String? _selectedLocalisation;
 
   Future<int> _getNextCounter() async {
@@ -44,7 +43,8 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
         'poids_utilise': 0,
         'volume_utilise': 0,
         'localisation': _selectedLocalisation,
-        'dechets': '', // Champ de déchets vide par défaut
+        'dcht_organique': 0, // Champ de déchets organiques par défaut à 0
+        'dcht_chimique': 0, // Champ de déchets chimiques par défaut à 0
         'acces': 'pokaty', // Par défaut, l'accès est "pokaty"
       }).then((value) {
         showDialog(
@@ -60,7 +60,9 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
                     _nomController.clear();
                     _poidsController.clear();
                     _volumeController.clear();
-                    _selectedLocalisation = null;
+                    setState(() {
+                      _selectedLocalisation = null;
+                    });
                     Navigator.of(context).pop();
                   },
                 ),
@@ -95,7 +97,7 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
   void dispose() {
     _nomController.dispose();
     _poidsController.dispose();
-    _volumeController.dispose(); // Disposer le contrôleur de volume
+    _volumeController.dispose();
     super.dispose();
   }
 
@@ -187,14 +189,13 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
                     ),
                     SizedBox(height: 20),
                     TextFormField(
-                      controller:
-                          _volumeController, // Utiliser le contrôleur de volume
+                      controller: _volumeController,
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,
                       ),
                       decoration: InputDecoration(
-                        labelText: 'Volume (en m³)', // Modifier en volume
+                        labelText: 'Volume (en m³)',
                         labelStyle: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[700],
@@ -203,7 +204,7 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         prefixIcon: Icon(
-                          Icons.volume_up, // Changer l'icône en icône de volume
+                          Icons.volume_up,
                           color: Colors.grey[700],
                         ),
                       ),

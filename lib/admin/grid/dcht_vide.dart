@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ListPoubelles extends StatelessWidget {
+class ListPoubellesAVider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Les listes des poubelles',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          'Les poubelles à vider',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         automaticallyImplyLeading: false,
       ),
@@ -34,7 +36,7 @@ class ListPoubelles extends StatelessWidget {
               }
 
               final poubelles = snapshot.data!.docs
-                  .where((doc) => doc['acces'] != 'feno')
+                  .where((doc) => doc['acces'] == 'feno')
                   .toList();
 
               return DataTable(
@@ -62,10 +64,10 @@ class ListPoubelles extends StatelessWidget {
                   final dchtOrganique = doc['dcht_organique'];
                   final dchtChimique = doc['dcht_chimique'];
 
-                  final organiquePourcentage =
-                      calculatePercentage(dchtOrganique, dchtChimique);
-                  final chimiquePourcentage =
-                      calculatePercentage(dchtChimique, dchtOrganique);
+                  final organiquePourcentage = formatPercentage(
+                      calculatePercentage(dchtOrganique, dchtChimique));
+                  final chimiquePourcentage = formatPercentage(
+                      calculatePercentage(dchtChimique, dchtOrganique));
 
                   return DataRow(cells: [
                     DataCell(Text(id)),
@@ -78,11 +80,22 @@ class ListPoubelles extends StatelessWidget {
                     DataCell(Text(organiquePourcentage)),
                     DataCell(Text(chimiquePourcentage)),
                     DataCell(
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
+                      ElevatedButton(
                         onPressed: () {
-                          _showDeleteConfirmationDialog(context, id, nom);
+                          _showViderConfirmationDialog(context, id, nom);
                         },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 16, 165, 8),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Vider',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
                   ]);
@@ -95,13 +108,20 @@ class ListPoubelles extends StatelessWidget {
     );
   }
 
-  String calculatePercentage(int numerator, int denominator) {
+  double calculatePercentage(int numerator, int denominator) {
     final total = numerator + denominator;
     if (total == 0) {
-      return '0%';
+      return 0;
     }
-    final percentage = (numerator / total) * 100;
-    return '${percentage.toStringAsFixed(2)}%';
+    return (numerator / total) * 100;
+  }
+
+  String formatPercentage(double percentage) {
+    if (percentage == percentage.toInt()) {
+      return percentage.toInt().toString() + '%';
+    } else {
+      return percentage.toStringAsFixed(2) + '%';
+    }
   }
 
   String formatNumber(num number) {
@@ -112,14 +132,14 @@ class ListPoubelles extends StatelessWidget {
     }
   }
 
-  void _showDeleteConfirmationDialog(
+  void _showViderConfirmationDialog(
       BuildContext context, String id, String nom) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmation de suppression'),
-          content: Text('Souhaitez-vous supprimer la poubelle "$nom" ?'),
+          title: Text('Confirmation de vidage'),
+          content: Text('Souhaitez-vous vider la poubelle "$nom" ?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -129,7 +149,7 @@ class ListPoubelles extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                _deletePoubelle(nom);
+                _viderPoubelle(id, nom);
                 Navigator.of(context).pop();
               },
               child: Text('Oui'),
@@ -140,15 +160,22 @@ class ListPoubelles extends StatelessWidget {
     );
   }
 
-  Future<void> _deletePoubelle(String nom) async {
+  Future<void> _viderPoubelle(String id, String nom) async {
     final querySnapshot = await FirebaseFirestore.instance
         .collection('poubelles')
         .where('nom', isEqualTo: nom)
+        .limit(1)
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
       final poubelleDoc = querySnapshot.docs.first;
-      await poubelleDoc.reference.delete();
+      await poubelleDoc.reference.update({
+        'dcht_chimique': 0,
+        'dcht_organique': 0,
+        'acces': 'pokaty',
+        'volume_utilise': 0,
+        'poids_utilise': 0,
+      });
     } else {
       print('Poubelle introuvable');
     }

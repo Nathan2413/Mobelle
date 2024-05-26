@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
-import 'admin/dashboard.dart'; // Importer le fichier dashboard.dart
-import 'personnel/dashboard.dart'; // Importer le fichier dashboard.dart
+import 'admin/dashboard.dart'; // Importer le fichier dashboard.dart pour admin
+import 'personnel/dashboard.dart'; // Importer le fichier dashboard.dart pour personnel
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -17,9 +17,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   final TextEditingController _passwordController = TextEditingController();
 
   String _errorMessage = ''; // Message d'erreur
-
   Color _borderColor = Colors.transparent; // Couleur de la bordure
-
   bool _obscurePassword = true; // Pour masquer le mot de passe
 
   late AnimationController _animationController;
@@ -174,9 +172,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
             ),
             textAlign: TextAlign.center, // Alignement central
           ),
-          SizedBox(
-            height: 16.0,
-          ),
+          SizedBox(height: 16.0),
           TextFormField(
             controller: _emailController,
             style: TextStyle(color: Colors.black), // Couleur du texte
@@ -244,8 +240,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
             },
           ),
           SizedBox(
-            height: 16.0,
-          ), // Espacement entre le champ de mot de passe et le bouton
+              height:
+                  16.0), // Espacement entre le champ de mot de passe et le bouton
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
@@ -285,8 +281,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
             ),
           ),
           SizedBox(
-            height: 16.0,
-          ), // Espacement entre le bouton et le message d'erreur
+              height:
+                  16.0), // Espacement entre le bouton et le message d'erreur
           Container(
             alignment: Alignment.center,
             child: Text(

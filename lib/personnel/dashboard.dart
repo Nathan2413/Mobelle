@@ -3,6 +3,7 @@ import '../login.dart';
 import '../carte.dart'; // Importer la page carte.dart
 import 'p_grid/p_list_pou.dart'; // Importer la page p_list_pou.dart
 import 'p_grid/p_dash.dart'; // Importer la page p_dash.dart
+import 'p_grid/p_dcht_vide.dart'; // Importer la page p_dcht_vide.dart
 
 class PDashboard extends StatefulWidget {
   const PDashboard({Key? key}) : super(key: key);
@@ -167,6 +168,9 @@ class _PDashboardState extends State<PDashboard> {
                               ),
                               onTap: () {
                                 // Action lorsque "Les poubelles à vider" est tapé
+                                setState(() {
+                                  _currentWidget = ListPoubellesAVider();
+                                });
                               },
                             ),
                           ],

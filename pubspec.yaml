@@ -42,6 +42,7 @@ dependencies:
   crypto: ^3.0.3
   convert: ^3.1.1
   file_picker: ^8.0.3
+
   
 
 dev_dependencies:
@@ -74,6 +75,8 @@ flutter:
     - images/plan2.jpg
     - images/bella.jpg
     - images/eau_vive.png
+    - images/oranges.png
+    - images/tomate.png
     - images/paire-baskets.png
     - images/bg.png
     - images/banane.png

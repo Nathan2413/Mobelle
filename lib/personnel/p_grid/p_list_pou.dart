@@ -42,7 +42,8 @@ class PListePoubelles extends StatelessWidget {
           );
         }
 
-        final poubelles = snapshot.data!.docs;
+        final poubelles =
+            snapshot.data!.docs.where((doc) => doc['acces'] != 'feno').toList();
 
         return SizedBox(
           width: tableWidth,
@@ -55,6 +56,8 @@ class PListePoubelles extends StatelessWidget {
               DataColumn(label: Text('Volume (m³)')),
               DataColumn(label: Text('Poids utilisé')),
               DataColumn(label: Text('Volume utilisé')),
+              DataColumn(label: Text('Organiques')),
+              DataColumn(label: Text('Chimiques')),
             ],
             rows: poubelles.map((doc) {
               final id = doc['id'];
@@ -64,20 +67,48 @@ class PListePoubelles extends StatelessWidget {
               final volume = doc['volume'];
               final poidsUtilise = doc['poids_utilise'];
               final volumeUtilise = doc['volume_utilise'];
+              final dchtOrganique = doc['dcht_organique'];
+              final dchtChimique = doc['dcht_chimique'];
+
+              final organiquePourcentage =
+                  calculatePercentage(dchtOrganique, dchtChimique);
+              final chimiquePourcentage =
+                  calculatePercentage(dchtChimique, dchtOrganique);
 
               return DataRow(cells: [
                 DataCell(Text(id)),
                 DataCell(Text(nom)),
                 DataCell(Text(localisation)),
-                DataCell(Text(poids.toString())),
-                DataCell(Text(volume.toString())),
-                DataCell(Text(poidsUtilise.toString())),
-                DataCell(Text(volumeUtilise.toString())),
+                DataCell(Text(formatNumber(poids))),
+                DataCell(Text(formatNumber(volume))),
+                DataCell(Text(formatNumber(poidsUtilise))),
+                DataCell(Text(formatNumber(volumeUtilise))),
+                DataCell(Text(organiquePourcentage)),
+                DataCell(Text(chimiquePourcentage)),
               ]);
             }).toList(),
           ),
         );
       },
     );
+  }
+
+  String calculatePercentage(int numerator, int denominator) {
+    final total = numerator + denominator;
+    if (total == 0) {
+      return '0%';
+    }
+    final percentage = (numerator / total) * 100;
+    return percentage == percentage.toInt()
+        ? percentage.toInt().toString() + '%'
+        : percentage.toStringAsFixed(2) + '%';
+  }
+
+  String formatNumber(num number) {
+    if (number == number.toInt()) {
+      return number.toInt().toString();
+    } else {
+      return number.toStringAsFixed(2);
+    }
   }
 }

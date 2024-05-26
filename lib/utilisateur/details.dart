@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'u_dashboard.dart';
 
-class DetailsPage extends StatelessWidget {
+class DetailsPage extends StatefulWidget {
   const DetailsPage({
     Key? key,
     required this.id,
@@ -13,6 +13,105 @@ class DetailsPage extends StatelessWidget {
   final String id;
   final String nom;
   final String localisation;
+
+  @override
+  _DetailsPageState createState() => _DetailsPageState();
+}
+
+class _DetailsPageState extends State<DetailsPage> {
+  final List<DocumentSnapshot> selectedDocuments = [];
+
+  void _updateSelection(DocumentSnapshot document, bool isSelected) {
+    setState(() {
+      if (isSelected) {
+        selectedDocuments.add(document);
+      } else {
+        selectedDocuments.remove(document);
+      }
+    });
+  }
+
+  Future<void> _updatePoubelle(BuildContext context) async {
+    int organiqueCount = 0;
+    int chimiqueCount = 0;
+    double totalMasse = 0;
+    double totalVolume = 0;
+
+    for (var document in selectedDocuments) {
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+      totalMasse += data['masse'].toDouble();
+      totalVolume += data['volume'].toDouble();
+      if (data['type'] == 'Organique') {
+        organiqueCount++;
+      } else if (data['type'] == 'Chimique') {
+        chimiqueCount++;
+      }
+    }
+
+    try {
+      QuerySnapshot poubelleQuery = await FirebaseFirestore.instance
+          .collection('poubelles')
+          .where('nom', isEqualTo: widget.nom)
+          .limit(1)
+          .get();
+
+      if (poubelleQuery.docs.isNotEmpty) {
+        DocumentReference poubelleRef = poubelleQuery.docs.first.reference;
+        Map<String, dynamic> poubelleData =
+            poubelleQuery.docs.first.data() as Map<String, dynamic>;
+
+        double newPoidsUtilise =
+            (poubelleData['poids_utilise'] as num).toDouble() + totalMasse;
+        double newVolumeUtilise =
+            (poubelleData['volume_utilise'] as num).toDouble() + totalVolume;
+
+        double poids = (poubelleData['poids'] as num).toDouble();
+        double volume = (poubelleData['volume'] as num).toDouble();
+
+        int currentOrganiqueCount = poubelleData['dcht_organique'] as int;
+        int currentChimiqueCount = poubelleData['dcht_chimique'] as int;
+
+        if (newPoidsUtilise > poids || newVolumeUtilise > volume) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                'Veuillez enlever quelques déchets car la poubelle est déjà remplie.'),
+          ));
+        } else {
+          Map<String, dynamic> updateData = {
+            'poids_utilise': newPoidsUtilise,
+            'volume_utilise': newVolumeUtilise,
+            'dcht_organique': currentOrganiqueCount + organiqueCount,
+            'dcht_chimique': currentChimiqueCount + chimiqueCount,
+          };
+
+          if (newPoidsUtilise > 0.97 * poids ||
+              newVolumeUtilise >= 0.97 * volume) {
+            updateData['acces'] = 'feno';
+          }
+
+          await poubelleRef.update(updateData);
+
+          if (updateData['acces'] == 'feno') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => UDashboard()),
+            );
+          } else {
+            Navigator.of(context).pop(); // Fermer l'alerte après la mise à jour
+          }
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              'Le document poubelle avec le nom ${widget.nom} n\'existe pas.'),
+        ));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Erreur lors de la mise à jour: $e'),
+      ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +192,7 @@ class DetailsPage extends StatelessWidget {
                         child: StreamBuilder(
                           stream: FirebaseFirestore.instance
                               .collection('poubelles')
-                              .where('nom', isEqualTo: nom)
+                              .where('nom', isEqualTo: widget.nom)
                               .snapshots(),
                           builder: (BuildContext context,
                               AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -113,19 +212,19 @@ class DetailsPage extends StatelessWidget {
                             var poubelle = snapshot.data!.docs.first;
                             Map<String, dynamic> data =
                                 poubelle.data() as Map<String, dynamic>;
-                            int poids = data['poids'];
-                            int volume = data['volume'];
+                            String id = data['id'];
+                            double poids = (data['poids'] as num).toDouble();
+                            double volume = (data['volume'] as num).toDouble();
 
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
-                                    SizedBox(width: 20),
                                     Icon(Icons.info_outline,
                                         color: Colors.blue),
                                     SizedBox(width: 10),
-                                    Text(id,
+                                    Text('$id',
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold)),
@@ -134,10 +233,9 @@ class DetailsPage extends StatelessWidget {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    SizedBox(width: 20),
                                     Icon(Icons.person, color: Colors.green),
                                     SizedBox(width: 10),
-                                    Text(nom,
+                                    Text('${widget.nom}',
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold)),
@@ -146,10 +244,9 @@ class DetailsPage extends StatelessWidget {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    SizedBox(width: 20),
                                     Icon(Icons.location_on, color: Colors.red),
                                     SizedBox(width: 10),
-                                    Text(localisation,
+                                    Text('${widget.localisation}',
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold)),
@@ -158,7 +255,6 @@ class DetailsPage extends StatelessWidget {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    SizedBox(width: 20),
                                     Icon(Icons.line_weight,
                                         color: Colors.orange),
                                     SizedBox(width: 10),
@@ -171,7 +267,6 @@ class DetailsPage extends StatelessWidget {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    SizedBox(width: 20),
                                     Icon(Icons.format_size,
                                         color: Colors.purple),
                                     SizedBox(width: 10),
@@ -205,20 +300,6 @@ class DetailsPage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Déchets',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -226,12 +307,16 @@ class DetailsPage extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color.fromARGB(255, 16, 165, 8),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               child: Text(
-                'Voir les déchets',
+                'Voir les Déchets',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -247,11 +332,10 @@ class DetailsPage extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Déchets'),
-          content: StreamBuilder(
+          content: StreamBuilder<QuerySnapshot>(
             stream:
                 FirebaseFirestore.instance.collection('dechets').snapshots(),
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Text('Erreur: ${snapshot.error}');
               }
@@ -262,43 +346,117 @@ class DetailsPage extends StatelessWidget {
 
               List<Widget> images =
                   snapshot.data!.docs.map((DocumentSnapshot document) {
-                Map<String, dynamic> data =
-                    document.data() as Map<String, dynamic>;
-                String imageName = data[
-                    'image']; // Changer ici selon la structure de votre base de données
-                String imageUrl = 'images/$imageName';
-                return Image.asset(
-                  imageUrl,
-                  width: 100,
-                  height: 100,
+                return _SelectableImage(
+                  document: document,
+                  onSelected: (bool isSelected) {
+                    _updateSelection(document, isSelected);
+                  },
                 );
               }).toList();
 
-              List<Widget> rows = [];
-              for (int i = 0; i < images.length; i += 2) {
-                List<Widget> rowChildren = [];
-                rowChildren.add(images[i]);
-                if (i + 1 < images.length) {
-                  rowChildren.add(images[i + 1]);
-                }
-                rows.add(Row(children: rowChildren));
-              }
-
-              return Column(
-                children: rows,
+              return SingleChildScrollView(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images,
+                ),
               );
             },
           ),
           actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Fermer'),
+            Container(
+              width: double.maxFinite,
+              child: Align(
+                alignment: Alignment.center,
+                child: TextButton(
+                  onPressed: () {
+                    _updatePoubelle(context);
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        Colors.lightGreenAccent),
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(10), // Bordure de 10%
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    'Mise à jour',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         );
       },
+    );
+  }
+}
+
+class _SelectableImage extends StatefulWidget {
+  final DocumentSnapshot document;
+  final ValueChanged<bool> onSelected;
+
+  const _SelectableImage({
+    required this.document,
+    required this.onSelected,
+  });
+
+  @override
+  __SelectableImageState createState() => __SelectableImageState();
+}
+
+class __SelectableImageState extends State<_SelectableImage> {
+  bool _isSelected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    Map<String, dynamic> data = widget.document.data() as Map<String, dynamic>;
+    String imageName = data['image']; // Changer selon votre base de données
+    String imageUrl = 'images/$imageName';
+    double masse = (data['masse'] as num).toDouble(); // Convertir en double
+    double volume = (data['volume'] as num).toDouble(); // Convertir en double
+    String type = data['type'];
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isSelected = !_isSelected;
+          widget.onSelected(_isSelected);
+        });
+      },
+      child: Container(
+        width: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: _isSelected ? Colors.lightGreenAccent : Colors.transparent,
+        ),
+        child: Column(
+          children: [
+            Image.asset(
+              imageUrl,
+              width: double.infinity,
+              height: 80,
+              fit: BoxFit.contain,
+            ),
+            Text(
+              'Masse: $masse kg\nVolume: $volume m³\nType: $type',
+              style: TextStyle(
+                fontSize: 10,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

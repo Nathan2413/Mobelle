@@ -27,10 +27,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -54,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDWW4iRdyvyPhsi3Fv91T-0MWGcY5N7kJg',
-    appId: '1:656682489119:android:fc7bd30303658485df4c2a',
+    appId: '1:656682489119:android:4f432875f4cc2965df4c2a',
     messagingSenderId: '656682489119',
     projectId: 'mobelle-e1322',
     storageBucket: 'mobelle-e1322.appspot.com',
@@ -77,4 +74,14 @@ class DefaultFirebaseOptions {
     storageBucket: 'mobelle-e1322.appspot.com',
     iosBundleId: 'com.example.moBelle',
   );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAER5oRACWNU4ETBBlICTZus49gaCOYOrc',
+    appId: '1:124062855782:web:e22876362d4e9bea6d73a7',
+    messagingSenderId: '124062855782',
+    projectId: 'mobelle-34855',
+    authDomain: 'mobelle-34855.firebaseapp.com',
+    storageBucket: 'mobelle-34855.appspot.com',
+  );
+
 }

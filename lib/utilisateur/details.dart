@@ -65,6 +65,10 @@ class _DetailsPageState extends State<DetailsPage> {
         double newVolumeUtilise =
             (poubelleData['volume_utilise'] as num).toDouble() + totalVolume;
 
+        // Formater les valeurs avec deux chiffres après la virgule
+        newPoidsUtilise = double.parse(newPoidsUtilise.toStringAsFixed(2));
+        newVolumeUtilise = double.parse(newVolumeUtilise.toStringAsFixed(2));
+
         double poids = (poubelleData['poids'] as num).toDouble();
         double volume = (poubelleData['volume'] as num).toDouble();
 
@@ -113,6 +117,12 @@ class _DetailsPageState extends State<DetailsPage> {
     }
   }
 
+  String formatPercentage(double value) {
+    return value == value.roundToDouble()
+        ? value.toStringAsFixed(0)
+        : value.toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,145 +161,162 @@ class _DetailsPageState extends State<DetailsPage> {
           },
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Details',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
-            ),
-            SizedBox(height: 20),
-            Container(
-              width: MediaQuery.of(context).size.width * 0.9,
-              height: MediaQuery.of(context).size.height * 0.3,
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                color: Colors.grey[300],
-                child: Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Image.asset(
-                          'images/bg.png',
-                          width: 150.0,
-                          height: 150.0,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      SizedBox(width: 20),
-                      Expanded(
-                        flex: 2,
-                        child: StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection('poubelles')
-                              .where('nom', isEqualTo: widget.nom)
-                              .snapshots(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.hasError) {
-                              return Text('Erreur: ${snapshot.error}');
-                            }
-
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            }
-
-                            if (snapshot.data!.docs.isEmpty) {
-                              return Text('Aucune poubelle disponible.');
-                            }
-
-                            var poubelle = snapshot.data!.docs.first;
-                            Map<String, dynamic> data =
-                                poubelle.data() as Map<String, dynamic>;
-                            String id = data['id'];
-                            double poids = (data['poids'] as num).toDouble();
-                            double volume = (data['volume'] as num).toDouble();
-
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.info_outline,
-                                        color: Colors.blue),
-                                    SizedBox(width: 10),
-                                    Text('$id',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    Icon(Icons.person, color: Colors.green),
-                                    SizedBox(width: 10),
-                                    Text('${widget.nom}',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    Icon(Icons.location_on, color: Colors.red),
-                                    SizedBox(width: 10),
-                                    Text('${widget.localisation}',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    Icon(Icons.line_weight,
-                                        color: Colors.orange),
-                                    SizedBox(width: 10),
-                                    Text('$poids kg',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    Icon(Icons.format_size,
-                                        color: Colors.purple),
-                                    SizedBox(width: 10),
-                                    Text('$volume m³',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Row(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(
+                  'Details',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    color: Colors.grey[300],
+                    child: Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Image.asset(
+                              'images/bg.png',
+                              width: 150.0,
+                              height: 150.0,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          SizedBox(width: 20),
+                          Expanded(
+                            flex: 2,
+                            child: StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection('poubelles')
+                                  .where('nom', isEqualTo: widget.nom)
+                                  .snapshots(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text('Erreur: ${snapshot.error}');
+                                }
+
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return CircularProgressIndicator();
+                                }
+
+                                if (snapshot.data!.docs.isEmpty) {
+                                  return Text('Aucune poubelle disponible.');
+                                }
+
+                                var poubelle = snapshot.data!.docs.first;
+                                Map<String, dynamic> data =
+                                    poubelle.data() as Map<String, dynamic>;
+                                String id = data['id'];
+                                double poids =
+                                    (data['poids'] as num).toDouble();
+                                double volume =
+                                    (data['volume'] as num).toDouble();
+                                double poidsUtilise =
+                                    (data['poids_utilise'] as num).toDouble();
+                                double volumeUtilise =
+                                    (data['volume_utilise'] as num).toDouble();
+
+                                double poidsPourcentage =
+                                    (poidsUtilise / poids) * 100;
+                                double volumePourcentage =
+                                    (volumeUtilise / volume) * 100;
+
+                                String poidsPourcentageStr =
+                                    formatPercentage(poidsPourcentage);
+
+                                String volumePourcentageStr =
+                                    formatPercentage(volumePourcentage);
+
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.info_outline,
+                                            color: Colors.blue),
+                                        SizedBox(width: 10),
+                                        Text('$id',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.person, color: Colors.green),
+                                        SizedBox(width: 10),
+                                        Text('${widget.nom}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.location_on,
+                                            color: Colors.red),
+                                        SizedBox(width: 10),
+                                        Text('${widget.localisation}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.line_weight,
+                                            color: Colors.orange),
+                                        SizedBox(width: 10),
+                                        Text('$poids kg',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.format_size,
+                                            color: Colors.purple),
+                                        SizedBox(width: 10),
+                                        Text('$volume m³',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
                 Text(
                   'Spécifique',
                   style: TextStyle(
@@ -298,29 +325,180 @@ class _DetailsPageState extends State<DetailsPage> {
                     color: Colors.grey,
                   ),
                 ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        height: 100,
+                        margin: EdgeInsets.symmetric(horizontal: 10),
+                        child: Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          color: Colors.grey[300],
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Poids',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              StreamBuilder(
+                                stream: FirebaseFirestore.instance
+                                    .collection('poubelles')
+                                    .where('nom', isEqualTo: widget.nom)
+                                    .snapshots(),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Erreur');
+                                  }
+
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return CircularProgressIndicator();
+                                  }
+
+                                  if (snapshot.data!.docs.isEmpty) {
+                                    return Text('N/A');
+                                  }
+
+                                  var poubelle = snapshot.data!.docs.first;
+                                  Map<String, dynamic> data =
+                                      poubelle.data() as Map<String, dynamic>;
+                                  double poids =
+                                      (data['poids'] as num).toDouble();
+                                  double poidsUtilise =
+                                      (data['poids_utilise'] as num).toDouble();
+
+                                  double poidsPourcentage =
+                                      (poidsUtilise / poids) * 100;
+
+                                  String poidsPourcentageStr =
+                                      formatPercentage(poidsPourcentage);
+
+                                  return Text(
+                                    '$poidsPourcentageStr %',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        height: 100,
+                        margin: EdgeInsets.symmetric(horizontal: 10),
+                        child: Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          color: Colors.grey[300],
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Volume',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              StreamBuilder(
+                                stream: FirebaseFirestore.instance
+                                    .collection('poubelles')
+                                    .where('nom', isEqualTo: widget.nom)
+                                    .snapshots(),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Erreur');
+                                  }
+
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return CircularProgressIndicator();
+                                  }
+
+                                  if (snapshot.data!.docs.isEmpty) {
+                                    return Text('N/A');
+                                  }
+
+                                  var poubelle = snapshot.data!.docs.first;
+                                  Map<String, dynamic> data =
+                                      poubelle.data() as Map<String, dynamic>;
+                                  double volume =
+                                      (data['volume'] as num).toDouble();
+                                  double volumeUtilise =
+                                      (data['volume_utilise'] as num)
+                                          .toDouble();
+
+                                  double volumePourcentage =
+                                      (volumeUtilise / volume) * 100;
+
+                                  String volumePourcentageStr =
+                                      formatPercentage(volumePourcentage);
+
+                                  return Text(
+                                    '$volumePourcentageStr %',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    _showDechetsAlert(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 16, 165, 8),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    'Voir les Déchets',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ],
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                _showDechetsAlert(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 16, 165, 8),
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                'Voir les Déchets',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

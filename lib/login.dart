@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'admin/dashboard.dart'; // Importer le fichier dashboard.dart pour admin
 import 'personnel/dashboard.dart'; // Importer le fichier dashboard.dart pour personnel
+import 'mdp_oub.dart'; // Importer le fichier mdp_oub.dart
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -246,8 +247,10 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                // Action à effectuer lors du clic sur "Mot de passe oublié"
-                // Ajoutez ici la logique pour gérer le mot de passe oublié
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MotDePasseOublie()),
+                );
               },
               child: Text(
                 'Mot de passe oublié',

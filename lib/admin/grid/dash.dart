@@ -90,7 +90,7 @@ class DashPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black, // Update color to match "Personnel"
+                      color: Colors.black,
                     ),
                   ),
                   SizedBox(height: 8),
@@ -138,17 +138,17 @@ class DashPage extends StatelessWidget {
                 );
               } else {
                 var data = dechetSnapshot.data!;
+                bool isEmpty = snapshot.data == 0;
                 return Card(
                   child: Column(
                     children: [
-                      SizedBox(height: 16), // Adjust space before title
+                      SizedBox(height: 16),
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 36, // Adjusted font size
+                          fontSize: 36,
                           fontWeight: FontWeight.bold,
-                          color:
-                              Colors.grey, // Update color to match "Personnel"
+                          color: Colors.grey,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -158,30 +158,37 @@ class DashPage extends StatelessWidget {
                           children: [
                             PieChart(
                               PieChartData(
-                                sections: [
-                                  PieChartSectionData(
-                                    value: data['Organique'] ?? 0,
-                                    title:
-                                        '${data['Organique']!.toStringAsFixed(2)}%',
-                                    color: Colors.green,
-                                    radius:
-                                        150, // Grand radius pour taille grande
-                                    titleStyle: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  PieChartSectionData(
-                                    value: data['Chimique'] ?? 0,
-                                    title:
-                                        '${data['Chimique']!.toStringAsFixed(2)}%',
-                                    color: Colors.red,
-                                    radius:
-                                        150, // Grand radius pour taille grande
-                                    titleStyle: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
+                                sections: isEmpty
+                                    ? [
+                                        PieChartSectionData(
+                                          value: 1,
+                                          title: '',
+                                          color: Colors.grey,
+                                          radius: 150,
+                                        )
+                                      ]
+                                    : [
+                                        PieChartSectionData(
+                                          value: data['Organique'] ?? 0,
+                                          title:
+                                              '${data['Organique']!.toStringAsFixed(2)}%',
+                                          color: Colors.green,
+                                          radius: 150,
+                                          titleStyle: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        PieChartSectionData(
+                                          value: data['Chimique'] ?? 0,
+                                          title:
+                                              '${data['Chimique']!.toStringAsFixed(2)}%',
+                                          color: Colors.red,
+                                          radius: 150,
+                                          titleStyle: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
                                 sectionsSpace: 2,
                                 centerSpaceRadius: 40,
                               ),
@@ -200,24 +207,25 @@ class DashPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      SizedBox(height: 1), // Adjust space after chart
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Indicator(
-                            color: Colors.green,
-                            text: 'Organique',
-                            isSquare: true,
-                          ),
-                          SizedBox(width: 16),
-                          Indicator(
-                            color: Colors.red,
-                            text: 'Chimique',
-                            isSquare: true,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8), // Adjust space after indicators
+                      SizedBox(height: 8),
+                      if (!isEmpty)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Indicator(
+                              color: Colors.green,
+                              text: 'Organique',
+                              isSquare: true,
+                            ),
+                            SizedBox(width: 16),
+                            Indicator(
+                              color: Colors.red,
+                              text: 'Chimique',
+                              isSquare: true,
+                            ),
+                          ],
+                        ),
+                      SizedBox(height: 8),
                     ],
                   ),
                 );

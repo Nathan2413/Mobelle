@@ -88,6 +88,7 @@ class TabDashboard extends StatelessWidget {
                 );
               } else {
                 var data = dechetSnapshot.data!;
+                bool isEmpty = snapshot.data == 0;
                 return Card(
                   child: Column(
                     children: [
@@ -108,33 +109,45 @@ class TabDashboard extends StatelessWidget {
                           children: [
                             PieChart(
                               PieChartData(
-                                sections: [
-                                  PieChartSectionData(
-                                    value: data['Organique'] ?? 0,
-                                    title:
-                                        '${data['Organique']!.toStringAsFixed(2)}%',
-                                    color: Colors.green,
-                                    radius:
-                                        150, // Grand radius pour taille grande
-                                    titleStyle: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  PieChartSectionData(
-                                    value: data['Chimique'] ?? 0,
-                                    title:
-                                        '${data['Chimique']!.toStringAsFixed(2)}%',
-                                    color: Colors.red,
-                                    radius:
-                                        150, // Grand radius pour taille grande
-                                    titleStyle: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
+                                sections: isEmpty
+                                    ? [
+                                        PieChartSectionData(
+                                          value: 1,
+                                          title: '',
+                                          color: Colors.grey,
+                                          radius: 150,
+                                        )
+                                      ]
+                                    : [
+                                        PieChartSectionData(
+                                          value: data['Organique'] ?? 0,
+                                          title:
+                                              '${data['Organique']!.toStringAsFixed(2)}%',
+                                          color: Colors.green,
+                                          radius:
+                                              150, // Grand radius pour taille grande
+                                          titleStyle: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        PieChartSectionData(
+                                          value: data['Chimique'] ?? 0,
+                                          title:
+                                              '${data['Chimique']!.toStringAsFixed(2)}%',
+                                          color: Colors.red,
+                                          radius:
+                                              150, // Grand radius pour taille grande
+                                          titleStyle: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
                                 sectionsSpace: 2,
                                 centerSpaceRadius: 40,
                               ),
+                              swapAnimationDuration: Duration(
+                                  milliseconds: 800), // Animation duration
+                              swapAnimationCurve: Curves.easeInOutCubic,
                             ),
                             Center(
                               child: Text(
@@ -151,22 +164,23 @@ class TabDashboard extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 4), // Adjust space after chart
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Indicator(
-                            color: Colors.green,
-                            text: 'Organique',
-                            isSquare: true,
-                          ),
-                          SizedBox(width: 16),
-                          Indicator(
-                            color: Colors.red,
-                            text: 'Chimique',
-                            isSquare: true,
-                          ),
-                        ],
-                      ),
+                      if (!isEmpty)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Indicator(
+                              color: Colors.green,
+                              text: 'Organique',
+                              isSquare: true,
+                            ),
+                            SizedBox(width: 16),
+                            Indicator(
+                              color: Colors.red,
+                              text: 'Chimique',
+                              isSquare: true,
+                            ),
+                          ],
+                        ),
                       SizedBox(height: 8), // Adjust space after indicators
                     ],
                   ),

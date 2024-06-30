@@ -3,7 +3,7 @@
 
 // WiFi credentials
 const char* ssid = "Hello";
-const char* password = "Carl020701T#an";
+const char* password = "Carl020701T#an"; 
 
 // Servo motor and infrared sensor pins
 Servo myservo;
@@ -57,18 +57,17 @@ void loop() {
   Serial.print(distance);
   Serial.println(" cm");
 
-  if (distance < 2.5) {  // Si la distance est inférieure à 2,5 cm
-    Serial.println("Ultrasonic distance < 2.5 cm. Servo remains at -25 degrees.");
-    myservo.write(-25); // Garder le servo à -25 degrés
-  } else if (irSensorValue == LOW) {  // Si l'infrarouge détecte un objet
-    Serial.println("Infrared detected, Ultrasonic distance >= 2.5 cm. Servo at 45 degrees.");
-    myservo.write(45); // Déplacer le servo à 45 degrés
-    delay(5000);       // Attendre 5 secondes
-    Serial.println("Returning to -25 degrees.");
-    myservo.write(-25); // Revenir à -25 degrés
+  if (irSensorValue == LOW) {  // Si l'infrarouge détecte un objet
+    if (distance >= 2.5 && distance <= 20) {  // Si la distance est comprise entre 2.5 cm et 20 cm
+      Serial.println("Infrared detected, Ultrasonic distance between 2.5 cm and 20 cm. Servo at 45 degrees.");
+      myservo.write(45); // Déplacer le servo à 45 degrés
+    } else {
+      Serial.println("Infrared detected, but Ultrasonic distance is out of range. Servo remains at -25 degrees.");
+      myservo.write(-25); // Garder le servo à -25 degrés
+    }
   } else {
-    Serial.println("No detection or conditions not met. Servo remains at -25 degrees.");
-    myservo.write(-25); // Assurer que le servo reste à -25 degrés
+    Serial.println("No infrared detection. Servo remains at -25 degrees.");
+    myservo.write(-25); // Garder le servo à -25 degrés
   }
   
   delay(1000); // Attendre 1 seconde avant de vérifier à nouveau

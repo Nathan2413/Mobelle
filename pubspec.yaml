@@ -84,6 +84,7 @@ flutter:
     - images/banane.png
     - images/oeuf.png
     - images/carton.png
+    - images/mdp_oub.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

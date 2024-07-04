@@ -48,7 +48,7 @@ class _CarteState extends State<Carte> with SingleTickerProviderStateMixin {
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: Image.asset(
-                  'images/plan2.jpg',
+                  'images/carte.png',
                   fit: BoxFit.contain,
                 ),
               ),

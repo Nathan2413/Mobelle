@@ -150,9 +150,9 @@ class _UDashboardState extends State<UDashboard>
               ),
             ),
             AspectRatio(
-              aspectRatio: 16 / 12,
+              aspectRatio: 12 / 12,
               child: Image.asset(
-                'images/plan2.jpg',
+                'images/carte.png',
                 fit: BoxFit.cover,
               ),
             ),

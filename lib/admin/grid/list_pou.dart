@@ -40,16 +40,36 @@ class ListPoubelles extends StatelessWidget {
               return DataTable(
                 horizontalMargin: 20,
                 columns: [
-                  DataColumn(label: Text('ID')),
-                  DataColumn(label: Text('Nom')),
-                  DataColumn(label: Text('Localisation')),
-                  DataColumn(label: Text('Poids (kg)')),
-                  DataColumn(label: Text('Volume (m³)')),
-                  DataColumn(label: Text('Poids utilisé')),
-                  DataColumn(label: Text('Volume utilisé')),
-                  DataColumn(label: Text('Organiques')),
-                  DataColumn(label: Text('Chimiques')),
-                  DataColumn(label: Text('Action')),
+                  DataColumn(
+                    label: Center(child: Text('ID')),
+                  ),
+                  DataColumn(
+                    label: Center(child: Text('Nom')),
+                  ),
+                  DataColumn(
+                    label: Center(child: Text('Localisation')),
+                  ),
+                  DataColumn(
+                    label: Center(child: Text('Poids (kg)')),
+                  ),
+                  DataColumn(
+                    label: Center(child: Text('Volume (m³)')),
+                  ),
+                  DataColumn(
+                    label: Center(child: Text('Poids utilisé')),
+                  ),
+                  DataColumn(
+                    label: Center(child: Text('Volume utilisé')),
+                  ),
+                  DataColumn(
+                    label: Center(child: Text('Organiques')),
+                  ),
+                  DataColumn(
+                    label: Center(child: Text('Chimiques')),
+                  ),
+                  DataColumn(
+                    label: Center(child: Text('Action')),
+                  ),
                 ],
                 rows: poubelles.map((doc) {
                   final id = doc['id'];
@@ -68,7 +88,7 @@ class ListPoubelles extends StatelessWidget {
                       calculatePercentage(dchtChimique, dchtOrganique);
 
                   return DataRow(cells: [
-                    DataCell(Text(id)),
+                    DataCell(Text(id.toString())),
                     DataCell(Text(nom)),
                     DataCell(Text(localisation)),
                     DataCell(Text(formatNumber(poids))),
@@ -78,11 +98,30 @@ class ListPoubelles extends StatelessWidget {
                     DataCell(Text(organiquePourcentage)),
                     DataCell(Text(chimiquePourcentage)),
                     DataCell(
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          _showDeleteConfirmationDialog(context, id, nom);
-                        },
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () {
+                              _editPoubelle(
+                                context,
+                                id.toString(),
+                                nom,
+                                poids.toDouble(),
+                                volume.toDouble(),
+                                localisation,
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              _showDeleteConfirmationDialog(
+                                  context, id.toString(), nom);
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ]);
@@ -153,4 +192,143 @@ class ListPoubelles extends StatelessWidget {
       print('Poubelle introuvable');
     }
   }
+
+  void _editPoubelle(BuildContext context, String id, String currentNom,
+      double currentPoids, double currentVolume, String currentLocalisation) {
+    _showEditDialog(context, id, currentNom, currentPoids, currentVolume,
+        currentLocalisation);
+  }
+
+  void _showEditDialog(BuildContext context, String id, String currentNom,
+      double currentPoids, double currentVolume, String currentLocalisation) {
+    // Liste des options de localisation
+    List<String> locations = [
+      'Parkings',
+      'Manèges',
+      'Carrousel',
+      'Restaurant',
+      'Etang',
+      'Cirque',
+    ];
+
+    // Initialiser le controller pour le champ Nom
+    TextEditingController nomController =
+        TextEditingController(text: currentNom);
+    // Initialiser le controller pour le champ Poids
+    TextEditingController poidsController =
+        TextEditingController(text: currentPoids.toString());
+    // Initialiser le controller pour le champ Volume
+    TextEditingController volumeController =
+        TextEditingController(text: currentVolume.toString());
+    // Initialiser la valeur sélectionnée pour le champ Localisation
+    String dropdownValue = currentLocalisation;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Modifier la poubelle'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextFormField(
+                controller: nomController,
+                decoration: InputDecoration(labelText: 'Nom de la poubelle'),
+              ),
+              TextFormField(
+                controller: poidsController,
+                decoration: InputDecoration(labelText: 'Poids maximum'),
+                keyboardType: TextInputType.number,
+              ),
+              TextFormField(
+                controller: volumeController,
+                decoration: InputDecoration(labelText: 'Volume'),
+                keyboardType: TextInputType.number,
+              ),
+              DropdownButtonFormField<String>(
+                value: dropdownValue,
+                decoration: InputDecoration(labelText: 'Localisation'),
+                onChanged: (String? newValue) {
+                  dropdownValue = newValue!;
+                },
+                items: locations.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Annuler'),
+            ),
+            TextButton(
+              onPressed: () {
+                _updatePoubelle(
+                    id,
+                    nomController.text,
+                    double.parse(poidsController.text),
+                    double.parse(volumeController.text),
+                    dropdownValue);
+                Navigator.of(context).pop();
+              },
+              child: Text('Modifier'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _updatePoubelle(String id, String nom, double poidsMax,
+      double volume, String localisation) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('poubelles')
+        .where('id', isEqualTo: id)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final poubelleDoc = querySnapshot.docs.first;
+      await poubelleDoc.reference.update({
+        'nom': nom,
+        'poids': poidsMax,
+        'volume': volume,
+        'localisation': localisation,
+      });
+    } else {
+      print('Poubelle introuvable');
+    }
+  }
+}
+
+class EditPoubelleScreen extends StatelessWidget {
+  final String id;
+
+  const EditPoubelleScreen({required this.id});
+
+  @override
+  Widget build(BuildContext context) {
+    // Implémentez ici l'interface utilisateur pour l'édition de la poubelle
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Modifier la poubelle'),
+      ),
+      body: Center(
+        child: Text('Édition de la poubelle avec ID: $id'),
+      ),
+    );
+  }
+}
+
+void main() {
+  runApp(MaterialApp(
+    title: 'Gestion des poubelles',
+    theme: ThemeData(primarySwatch: Colors.blue),
+    home: ListPoubelles(),
+  ));
 }

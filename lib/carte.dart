@@ -20,7 +20,7 @@ class _CarteState extends State<Carte> with SingleTickerProviderStateMixin {
     _animation = Tween<double>(
       begin:
           0.9, // Ajuster la valeur de départ pour agrandir légèrement l'image
-      end: 1.1,
+      end: 0.95, // Nouvelle valeur de fin pour diminuer légèrement l'image
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOutQuart,

@@ -55,7 +55,7 @@ class _MotDePasseOublieState extends State<MotDePasseOublie> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 50.0), // Espace supplémentaire en haut
@@ -163,22 +163,36 @@ class _MotDePasseOublieState extends State<MotDePasseOublie> {
                       ),
                       SizedBox(height: 20.0),
                     ],
-                    ElevatedButton(
-                      onPressed: () {
-                        if (showPasswordFields) {
-                          _updatePassword(context);
-                        } else {
-                          _verifyInformation(context);
-                        }
-                      },
-                      child:
-                          Text(showPasswordFields ? 'Mise à jour' : 'Vérifier'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: customGreenColor, // Couleur spécifique
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 32.0,
-                          vertical: 16.0,
-                        ),
+                    // Nouvelle colonne pour centrer les boutons
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              if (showPasswordFields) {
+                                _updatePassword(context);
+                              } else {
+                                _verifyInformation(context);
+                              }
+                            },
+                            child: Text(showPasswordFields
+                                ? 'Mise à jour'
+                                : 'Vérifier'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  customGreenColor, // Couleur spécifique
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 32.0,
+                                vertical: 16.0,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    10.0), // Border radius 10%
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

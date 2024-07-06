@@ -82,7 +82,13 @@ flutter:
     - images/paire-baskets.png
     - images/bg.png
     - images/carte.png
-    - images/parking.png
+    - images/map/cirque.png
+    - images/map/etang.png
+    - images/map/manege.png
+    - images/map/restaurant.png
+    - images/map/toboggan.png
+    - images/map/parking.png
+    - images/map/carte.png
     - images/banane.png
     - images/oeuf.png
     - images/carton.png

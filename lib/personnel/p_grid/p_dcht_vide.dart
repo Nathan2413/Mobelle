@@ -44,13 +44,13 @@ class ListPoubellesAVider extends StatelessWidget {
                 columns: [
                   DataColumn(label: Text('ID')),
                   DataColumn(label: Text('Nom')),
-                  DataColumn(label: Text('Localisation')),
                   DataColumn(label: Text('Poids (kg)')),
                   DataColumn(label: Text('Volume (m³)')),
                   DataColumn(label: Text('Poids utilisé')),
                   DataColumn(label: Text('Volume utilisé')),
                   DataColumn(label: Text('Organiques')),
                   DataColumn(label: Text('Chimiques')),
+                  DataColumn(label: Text('Localisation')), // Nouvelle colonne
                   DataColumn(label: Text('Action')),
                 ],
                 rows: poubelles.map((doc) {
@@ -72,13 +72,31 @@ class ListPoubellesAVider extends StatelessWidget {
                   return DataRow(cells: [
                     DataCell(Text(id)),
                     DataCell(Text(nom)),
-                    DataCell(Text(localisation)),
                     DataCell(Text(formatNumber(poids))),
                     DataCell(Text(formatNumber(volume))),
                     DataCell(Text(formatNumber(poidsUtilise))),
                     DataCell(Text(formatNumber(volumeUtilise))),
                     DataCell(Text(organiquePourcentage)),
                     DataCell(Text(chimiquePourcentage)),
+                    DataCell(
+                      ElevatedButton(
+                        onPressed: () {
+                          _showLocalisationDialog(context, localisation);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 16, 165, 8),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          localisation, // Affiche la localisation ici
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
                     DataCell(
                       ElevatedButton(
                         onPressed: () {
@@ -132,6 +150,52 @@ class ListPoubellesAVider extends StatelessWidget {
     }
   }
 
+  void _showLocalisationDialog(BuildContext context, String localisation) {
+    String imagePath = 'images/map/';
+
+    // Assigner le chemin d'image en fonction de la localisation
+    switch (localisation) {
+      case 'Parkings':
+        imagePath += 'parking.png';
+        break;
+      case 'Restaurant':
+        imagePath += 'restaurant.png';
+        break;
+      case 'Manèges':
+        imagePath += 'manege.png';
+        break;
+      case 'Toboggan':
+        imagePath += 'toboggan.png';
+        break;
+      case 'Etang':
+        imagePath += 'etang.png';
+        break;
+      case 'Cirque':
+        imagePath += 'cirque.png';
+        break;
+      default:
+        // Utiliser une image par défaut ou afficher un message d'erreur
+        imagePath += 'carte.png'; // Chemin vers une image par défaut
+        break;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.contain,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _showViderConfirmationDialog(
       BuildContext context, String id, String nom) {
     showDialog(
@@ -180,4 +244,10 @@ class ListPoubellesAVider extends StatelessWidget {
       print('Poubelle introuvable');
     }
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: ListPoubellesAVider(),
+  ));
 }

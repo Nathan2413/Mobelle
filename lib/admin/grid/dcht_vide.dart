@@ -151,6 +151,34 @@ class ListPoubellesAVider extends StatelessWidget {
   }
 
   void _showLocalisationDialog(BuildContext context, String localisation) {
+    String imagePath = 'images/map/';
+
+    // Assigner le chemin d'image en fonction de la localisation
+    switch (localisation) {
+      case 'Parkings':
+        imagePath += 'parking.png';
+        break;
+      case 'Restaurant':
+        imagePath += 'restaurant.png';
+        break;
+      case 'Manèges':
+        imagePath += 'manege.png';
+        break;
+      case 'Toboggan':
+        imagePath += 'toboggan.png';
+        break;
+      case 'Etang':
+        imagePath += 'etang.png';
+        break;
+      case 'Cirque':
+        imagePath += 'cirque.png';
+        break;
+      default:
+        // Utiliser une image par défaut ou afficher un message d'erreur
+        imagePath += 'carte.png'; // Chemin vers une image par défaut
+        break;
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -159,9 +187,8 @@ class ListPoubellesAVider extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
             child: Image.asset(
-              'images/parking.png', // Chemin vers l'image
-              fit: BoxFit
-                  .contain, // Ajustement de l'image pour tenir dans AlertDialog
+              imagePath,
+              fit: BoxFit.contain,
             ),
           ),
         );

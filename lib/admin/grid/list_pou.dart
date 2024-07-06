@@ -205,7 +205,7 @@ class ListPoubelles extends StatelessWidget {
     List<String> locations = [
       'Parkings',
       'Manèges',
-      'Carrousel',
+      'Toboggan',
       'Restaurant',
       'Etang',
       'Cirque',

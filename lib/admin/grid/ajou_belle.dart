@@ -10,12 +10,12 @@ class AjoutPoubellePage extends StatefulWidget {
 
 class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
   static const List<String> localisations = [
-    'Chambre 1',
-    'Chambre 2',
-    'Bureau',
-    'Cuisine',
-    'Garage',
-    'Terrasse',
+    'Parkings',
+    'Manèges',
+    'Toboggan',
+    'Restaurant',
+    'Etang',
+    'Cirque',
   ];
 
   final _formKey = GlobalKey<FormState>();

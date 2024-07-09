@@ -18,11 +18,17 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
     'Cirque',
   ];
 
+  static const List<String> garbageOptions = [
+    'virtuel',
+    'reel',
+  ];
+
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nomController = TextEditingController();
   final TextEditingController _poidsController = TextEditingController();
   final TextEditingController _volumeController = TextEditingController();
   String? _selectedLocalisation;
+  String? _selectedGarbage;
 
   Future<int> _getNextCounter() async {
     final QuerySnapshot<Map<String, dynamic>> poubelles =
@@ -43,6 +49,7 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
         'poids_utilise': 0,
         'volume_utilise': 0,
         'localisation': _selectedLocalisation,
+        'garbage': _selectedGarbage, // Champ de type de déchets
         'dcht_organique': 0, // Champ de déchets organiques par défaut à 0
         'dcht_chimique': 0, // Champ de déchets chimiques par défaut à 0
         'acces': 'pokaty', // Par défaut, l'accès est "pokaty"
@@ -62,6 +69,8 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
                     _volumeController.clear();
                     setState(() {
                       _selectedLocalisation = null;
+                      _selectedGarbage =
+                          null; // Réinitialiser le choix de déchets
                     });
                     Navigator.of(context).pop();
                   },
@@ -246,6 +255,41 @@ class _AjoutPoubellePageState extends State<AjoutPoubellePage> {
                       validator: (value) {
                         if (value == null) {
                           return 'Veuillez sélectionner une localisation';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    DropdownButtonFormField<String>(
+                      value: _selectedGarbage,
+                      decoration: InputDecoration(
+                        labelText: 'Type de déchets',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[700],
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.delete,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      items: garbageOptions.map((String garbageOption) {
+                        return DropdownMenuItem<String>(
+                          value: garbageOption,
+                          child: Text(garbageOption),
+                        );
+                      }).toList(),
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedGarbage = value;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Veuillez sélectionner le type de déchets';
                         }
                         return null;
                       },

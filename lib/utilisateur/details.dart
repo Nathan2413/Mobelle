@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:photo_view/photo_view.dart';
 import 'u_dashboard.dart';
 
 class DetailsPage extends StatefulWidget {
@@ -121,6 +122,59 @@ class _DetailsPageState extends State<DetailsPage> {
     return value == value.roundToDouble()
         ? value.toStringAsFixed(0)
         : value.toStringAsFixed(2);
+  }
+
+  void _showLocalisationImage(BuildContext context, String localisation) {
+    String imagePath = 'images/map/';
+
+    // Assigner le chemin d'image en fonction de la localisation
+    switch (localisation) {
+      case 'Parkings':
+        imagePath += 'parking.png';
+        break;
+      case 'Restaurant':
+        imagePath += 'restaurant.png';
+        break;
+      case 'Manèges':
+        imagePath += 'manege.png';
+        break;
+      case 'Toboggan':
+        imagePath += 'toboggan.png';
+        break;
+      case 'Etang':
+        imagePath += 'etang.png';
+        break;
+      case 'Cirque':
+        imagePath += 'cirque.png';
+        break;
+      default:
+        imagePath += 'carte.png'; // Chemin vers une image par défaut
+        break;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: PhotoView(
+                imageProvider: AssetImage(imagePath),
+                backgroundDecoration: BoxDecoration(
+                  color: Colors.transparent,
+                ),
+                minScale: PhotoViewComputedScale.contained,
+                maxScale: PhotoViewComputedScale.covered * 2,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -271,16 +325,20 @@ class _DetailsPageState extends State<DetailsPage> {
                                       ],
                                     ),
                                     SizedBox(height: 10),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.location_on,
-                                            color: Colors.red),
-                                        SizedBox(width: 10),
-                                        Text('${widget.localisation}',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold)),
-                                      ],
+                                    GestureDetector(
+                                      onTap: () => _showLocalisationImage(
+                                          context, widget.localisation),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.location_on,
+                                              color: Colors.red),
+                                          SizedBox(width: 10),
+                                          Text('${widget.localisation}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold)),
+                                        ],
+                                      ),
                                     ),
                                     SizedBox(height: 10),
                                     Row(
@@ -637,4 +695,14 @@ class __SelectableImageState extends State<_SelectableImage> {
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: DetailsPage(
+      id: 'id',
+      nom: 'nom',
+      localisation: 'localisation',
+    ),
+  ));
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:photo_view/photo_view.dart';
 
 class ListPoubellesAVider extends StatelessWidget {
   @override
@@ -182,13 +183,20 @@ class ListPoubellesAVider extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          content: SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.contain,
+        return Dialog(
+          backgroundColor:
+              Colors.transparent, // Rendre l'arrière-plan transparent
+          child: GestureDetector(
+            onTap: () => Navigator.of(context)
+                .pop(), // Fermer la boîte de dialogue en tapant
+            child: Container(
+              child: PhotoView(
+                imageProvider: AssetImage(imagePath),
+                backgroundDecoration: BoxDecoration(
+                  color:
+                      Colors.transparent, // Rendre l'arrière-plan transparent
+                ),
+              ),
             ),
           ),
         );

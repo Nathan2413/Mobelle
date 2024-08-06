@@ -42,10 +42,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyCswDlIiXXYaKmhkT6CS0mF4NB2A8rNFSI',
-    appId: '1:656682489119:web:861782a4624a8ca3df4c2a',
+    appId: '1:656682489119:web:0b7acbc7fa921361df4c2a',
     messagingSenderId: '656682489119',
     projectId: 'mobelle-e1322',
     authDomain: 'mobelle-e1322.firebaseapp.com',
+    databaseURL: 'https://mobelle-e1322-default-rtdb.firebaseio.com',
     storageBucket: 'mobelle-e1322.appspot.com',
   );
 
@@ -54,6 +55,7 @@ class DefaultFirebaseOptions {
     appId: '1:656682489119:android:4f432875f4cc2965df4c2a',
     messagingSenderId: '656682489119',
     projectId: 'mobelle-e1322',
+    databaseURL: 'https://mobelle-e1322-default-rtdb.firebaseio.com',
     storageBucket: 'mobelle-e1322.appspot.com',
   );
 
@@ -62,6 +64,7 @@ class DefaultFirebaseOptions {
     appId: '1:656682489119:ios:99c42a40961fe772df4c2a',
     messagingSenderId: '656682489119',
     projectId: 'mobelle-e1322',
+    databaseURL: 'https://mobelle-e1322-default-rtdb.firebaseio.com',
     storageBucket: 'mobelle-e1322.appspot.com',
     iosBundleId: 'com.example.moBelle',
   );
@@ -71,17 +74,19 @@ class DefaultFirebaseOptions {
     appId: '1:656682489119:ios:99c42a40961fe772df4c2a',
     messagingSenderId: '656682489119',
     projectId: 'mobelle-e1322',
+    databaseURL: 'https://mobelle-e1322-default-rtdb.firebaseio.com',
     storageBucket: 'mobelle-e1322.appspot.com',
     iosBundleId: 'com.example.moBelle',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAER5oRACWNU4ETBBlICTZus49gaCOYOrc',
-    appId: '1:124062855782:web:e22876362d4e9bea6d73a7',
-    messagingSenderId: '124062855782',
-    projectId: 'mobelle-34855',
-    authDomain: 'mobelle-34855.firebaseapp.com',
-    storageBucket: 'mobelle-34855.appspot.com',
+    apiKey: 'AIzaSyCswDlIiXXYaKmhkT6CS0mF4NB2A8rNFSI',
+    appId: '1:656682489119:web:0b7acbc7fa921361df4c2a',
+    messagingSenderId: '656682489119',
+    projectId: 'mobelle-e1322',
+    authDomain: 'mobelle-e1322.firebaseapp.com',
+    databaseURL: 'https://mobelle-e1322-default-rtdb.firebaseio.com',
+    storageBucket: 'mobelle-e1322.appspot.com',
   );
 
 }

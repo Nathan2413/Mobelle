@@ -4,6 +4,7 @@ import '../carte.dart'; // Importer la page carte.dart
 import 'p_grid/p_list_pou.dart'; // Importer la page p_list_pou.dart
 import 'p_grid/p_dash.dart'; // Importer la page p_dash.dart
 import 'p_grid/p_dcht_vide.dart'; // Importer la page p_dcht_vide.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PDashboard extends StatefulWidget {
   const PDashboard({Key? key}) : super(key: key);
@@ -15,11 +16,23 @@ class PDashboard extends StatefulWidget {
 class _PDashboardState extends State<PDashboard> {
   Widget _currentWidget =
       SizedBox(); // Widget actuel à afficher dans le côté droit
+  int _poubellesAViderCount = 0; // Compteur des poubelles à vider
 
   @override
   void initState() {
     super.initState();
     _currentWidget = TabDashboard(); // Initialiser avec p_dash.dart
+    _listenToPoubellesAVider(); // Écouter les changements pour les poubelles à vider
+  }
+
+  void _listenToPoubellesAVider() {
+    // Écouter les changements du nombre de poubelles à vider
+    getCountStream('poubelles', field: 'acces', isEqualTo: 'feno')
+        .listen((count) {
+      setState(() {
+        _poubellesAViderCount = count;
+      });
+    });
   }
 
   @override
@@ -133,44 +146,198 @@ class _PDashboardState extends State<PDashboard> {
                         ),
                         ExpansionTile(
                           leading: Icon(Icons.delete),
-                          title: Text(
-                            'Poubelles',
-                            style: TextStyle(
-                              fontSize: 22,
-                            ),
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Poubelles',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                ),
+                              ),
+                              SizedBox(
+                                  width:
+                                      15), // Espacement fixe entre le texte et le nombre
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color:
+                                      _getPoubellesAViderColor(), // Couleur du cercle en fonction du nombre
+                                ),
+                              ),
+                            ],
                           ),
                           tilePadding: EdgeInsets.only(left: 20),
                           children: [
-                            ListTile(
-                              contentPadding: EdgeInsets.only(left: 40),
-                              leading: Icon(Icons.list),
-                              title: Text(
-                                'Tous les poubelles',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                ),
-                              ),
-                              onTap: () {
-                                // Action lorsque "Tous les poubelles" est tapé
-                                setState(() {
-                                  _currentWidget = PListePoubelles();
-                                });
+                            StreamBuilder<int>(
+                              stream: getCountStream('poubelles',
+                                  field: 'acces', isEqualTo: 'pokaty'),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.only(left: 40),
+                                    leading: Icon(Icons.list),
+                                    title: Row(
+                                      children: [
+                                        Text(
+                                          'Tous les poubelles',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            width:
+                                                15), // Espacement fixe entre le texte et le nombre
+                                        CircularProgressIndicator(), // Indicateur de chargement
+                                      ],
+                                    ),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.only(left: 40),
+                                    leading: Icon(Icons.list),
+                                    title: Row(
+                                      children: [
+                                        Text(
+                                          'Tous les poubelles',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            width:
+                                                15), // Espacement fixe entre le texte et le nombre
+                                        Text(
+                                          'Erreur',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.only(left: 40),
+                                    leading: Icon(Icons.list),
+                                    title: Row(
+                                      children: [
+                                        Text(
+                                          'Tous les poubelles',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            width:
+                                                35), // Espacement fixe entre le texte et le nombre
+                                        Text(
+                                          '${snapshot.data}',
+                                          style: TextStyle(
+                                            color: Colors.green,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      // Action lorsque "Tous les poubelles" est tapé
+                                      setState(() {
+                                        _currentWidget =
+                                            PListePoubelles(); // Afficher PListePoubelles
+                                      });
+                                    },
+                                  );
+                                }
                               },
                             ),
-                            ListTile(
-                              contentPadding: EdgeInsets.only(left: 40),
-                              leading: Icon(Icons.delete_sweep),
-                              title: Text(
-                                'Les poubelles à vider',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                ),
-                              ),
-                              onTap: () {
-                                // Action lorsque "Les poubelles à vider" est tapé
-                                setState(() {
-                                  _currentWidget = ListPoubellesAVider();
-                                });
+                            StreamBuilder<int>(
+                              stream: getCountStream('poubelles',
+                                  field: 'acces', isEqualTo: 'feno'),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.only(left: 40),
+                                    leading: Icon(Icons.delete_sweep),
+                                    title: Row(
+                                      children: [
+                                        Text(
+                                          'Les poubelles à vider',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            width:
+                                                15), // Espacement fixe entre le texte et le nombre
+                                        CircularProgressIndicator(), // Indicateur de chargement
+                                      ],
+                                    ),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.only(left: 40),
+                                    leading: Icon(Icons.delete_sweep),
+                                    title: Row(
+                                      children: [
+                                        Text(
+                                          'Les poubelles à vider',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            width:
+                                                15), // Espacement fixe entre le texte et le nombre
+                                        Text(
+                                          'Erreur',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.only(left: 40),
+                                    leading: Icon(Icons.delete_sweep),
+                                    title: Row(
+                                      children: [
+                                        Text(
+                                          'Les poubelles à vider',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            width:
+                                                15), // Espacement fixe entre le texte et le nombre
+                                        Text(
+                                          '${snapshot.data}',
+                                          style: TextStyle(
+                                            color: Colors
+                                                .green, // Chiffres toujours en vert
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      // Action lorsque "Les poubelles à vider" est tapé
+                                      setState(() {
+                                        _currentWidget =
+                                            ListPoubellesAVider(); // Afficher ListPoubellesAVider
+                                      });
+                                    },
+                                  );
+                                }
                               },
                             ),
                           ],
@@ -210,5 +377,18 @@ class _PDashboardState extends State<PDashboard> {
         ],
       ),
     );
+  }
+
+  Stream<int> getCountStream(String collection,
+      {String? field, String? isEqualTo}) {
+    Query query = FirebaseFirestore.instance.collection(collection);
+    if (field != null && isEqualTo != null) {
+      query = query.where(field, isEqualTo: isEqualTo);
+    }
+    return query.snapshots().map((snapshot) => snapshot.docs.length);
+  }
+
+  Color _getPoubellesAViderColor() {
+    return _poubellesAViderCount > 0 ? Colors.red : Colors.green;
   }
 }

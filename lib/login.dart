@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
-import 'admin/dashboard.dart'; // Importer le fichier dashboard.dart pour admin
-import 'personnel/dashboard.dart'; // Importer le fichier dashboard.dart pour personnel
-import 'mdp_oub.dart'; // Importer le fichier mdp_oub.dart
+import 'admin/dashboard.dart';
+import 'personnel/dashboard.dart';
+import 'mdp_oub.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -17,20 +17,25 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  String _errorMessage = ''; // Message d'erreur
-  Color _borderColor = Colors.transparent; // Couleur de la bordure
-  bool _obscurePassword = true; // Pour masquer le mot de passe
+  String _errorMessage = '';
+  Color _borderColor = Colors.transparent;
+  bool _obscurePassword = true;
 
   late AnimationController _animationController;
   late Animation<double> _imageAnimation;
   late Animation<double> _formAnimation;
+
+  final Color _primaryColor = Color(0xFF4CAF50); // Couleur verte principale
+  final Color _accentColor =
+      Color(0xFF2E7D32); // Couleur verte foncée pour les accents
+  final Color _textColor = Colors.grey[800]!; // Couleur du texte en gris foncé
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 2), // Durée de l'animation (2 secondes)
+      duration: Duration(seconds: 2),
     );
     _imageAnimation = Tween<double>(
       begin: -1,
@@ -38,8 +43,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     ).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Interval(0, 0.5,
-            curve: Curves.easeInOut), // Courbe de l'animation pour l'image
+        curve: Interval(0, 0.5, curve: Curves.easeInOut),
       ),
     );
     _formAnimation = Tween<double>(
@@ -48,9 +52,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     ).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Interval(0.5, 1,
-            curve:
-                Curves.easeInOut), // Courbe de l'animation pour le formulaire
+        curve: Interval(0.5, 1, curve: Curves.easeInOut),
       ),
     );
     _animationController.forward();
@@ -64,28 +66,27 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // Déterminer si l'application est exécutée sur un téléphone ou dans Chrome
     final bool isMobile = MediaQuery.of(context).size.width < 600;
 
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
         return Scaffold(
+          backgroundColor: Colors.white,
           appBar: AppBar(
-            title: Text(''), // Titre de la page de connexion
+            title: Text(''),
+            backgroundColor: Colors.white,
+            elevation: 0,
             iconTheme: IconThemeData(
-              color: Colors.grey,
-            ), // Couleur de l'icône de retour
+              color: _textColor,
+            ),
           ),
-          body: isMobile
-              ? buildMobileLayout() // Utiliser la mise en page mobile
-              : buildWebLayout(), // Utiliser la mise en page Web
+          body: isMobile ? buildMobileLayout() : buildWebLayout(),
         );
       },
     );
   }
 
-  // Mise en page pour les appareils mobiles
   Widget buildMobileLayout() {
     return SingleChildScrollView(
       child: Column(
@@ -93,32 +94,25 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         children: [
           Transform(
             transform: Matrix4.translationValues(
-                MediaQuery.of(context).size.width *
-                    _imageAnimation
-                        .value, // Animation de gauche à droite pour l'image
+                MediaQuery.of(context).size.width * _imageAnimation.value,
                 0,
                 0),
             child: FractionallySizedBox(
-              widthFactor: 0.8, // Facteur de taille de l'image
-              child: Image.asset('images/pou5.jpg'), // Image en haut
+              widthFactor: 0.8,
+              child: Image.asset('images/pou5.jpg'),
             ),
           ),
           SizedBox(height: 16.0),
           Transform(
             transform: Matrix4.translationValues(
-                MediaQuery.of(context).size.width *
-                    _formAnimation
-                        .value, // Animation de droite à gauche pour le formulaire
-                0,
-                0),
-            child: buildForm(), // Formulaire de connexion
+                MediaQuery.of(context).size.width * _formAnimation.value, 0, 0),
+            child: buildForm(),
           ),
         ],
       ),
     );
   }
 
-  // Mise en page pour le navigateur Chrome de Visual Studio
   Widget buildWebLayout() {
     return Row(
       children: [
@@ -126,13 +120,10 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
           flex: 1,
           child: Transform(
             transform: Matrix4.translationValues(
-                MediaQuery.of(context).size.width *
-                    _imageAnimation
-                        .value, // Animation de gauche à droite pour l'image
+                MediaQuery.of(context).size.width * _imageAnimation.value,
                 0,
                 0),
-            child: Image.asset(
-                'images/pou5.jpg'), // Image dans la première colonne
+            child: Image.asset('images/pou5.jpg'),
           ),
         ),
         Expanded(
@@ -141,13 +132,10 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
             padding: EdgeInsets.all(16.0),
             child: Transform(
               transform: Matrix4.translationValues(
-                  MediaQuery.of(context).size.width *
-                      _formAnimation
-                          .value, // Animation de droite à gauche pour le formulaire
+                  MediaQuery.of(context).size.width * _formAnimation.value,
                   0,
                   0),
-              child:
-                  buildForm(), // Formulaire de connexion dans la deuxième colonne
+              child: buildForm(),
             ),
           ),
         ),
@@ -155,7 +143,6 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Construction du formulaire de connexion
   Widget buildForm() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -163,86 +150,76 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          // Ajouter le grand titre "Mo Belle" en haut de l'entrée de l'adresse e-mail
           Text(
             'Mo Belle',
             style: TextStyle(
-              fontSize: 40.0, // Taille de la police
-              fontWeight: FontWeight.bold, // Gras
-              color: Color.fromARGB(255, 35, 223, 126), // Couleur verte
+              fontSize: 40.0,
+              fontWeight: FontWeight.bold,
+              color: _primaryColor,
             ),
-            textAlign: TextAlign.center, // Alignement central
+            textAlign: TextAlign.center,
           ),
           SizedBox(height: 16.0),
           TextFormField(
             controller: _emailController,
-            style: TextStyle(color: Colors.black), // Couleur du texte
+            style: TextStyle(color: _textColor),
             decoration: InputDecoration(
-              labelText: 'Email', // Label du champ email
-              prefixIcon: Icon(Icons.email), // Icône de l'e-mail
+              labelText: 'Email',
+              prefixIcon: Icon(Icons.email, color: _accentColor),
               border: UnderlineInputBorder(
                 borderSide: BorderSide(
-                  color: _borderColor, // Couleur de la bordure
+                  color: _borderColor,
                 ),
               ),
             ),
             onTap: () {
               setState(() {
-                _borderColor =
-                    Colors.grey; // Changer la couleur de la bordure au clic
+                _borderColor = Colors.grey;
               });
             },
             onEditingComplete: () {
               setState(() {
-                _borderColor = Colors
-                    .transparent; // Rendre la bordure invisible après l'édition
+                _borderColor = Colors.transparent;
               });
             },
           ),
-          SizedBox(height: 16.0), // Espacement entre les champs
+          SizedBox(height: 16.0),
           TextFormField(
             controller: _passwordController,
-            obscureText:
-                _obscurePassword, // Masquer le texte saisi (pour le mot de passe)
-            style: TextStyle(color: Colors.black), // Couleur du texte
+            obscureText: _obscurePassword,
+            style: TextStyle(color: _textColor),
             decoration: InputDecoration(
-              labelText: 'Mot de passe', // Label du champ mot de passe
-              prefixIcon: Icon(Icons.lock), // Icône du mot de passe
+              labelText: 'Mot de passe',
+              prefixIcon: Icon(Icons.lock, color: _accentColor),
               border: UnderlineInputBorder(
                 borderSide: BorderSide(
-                  color: _borderColor, // Couleur de la bordure
+                  color: _borderColor,
                 ),
               ),
               suffixIcon: IconButton(
                 onPressed: () {
                   setState(() {
-                    _obscurePassword =
-                        !_obscurePassword; // Inverser la visibilité du mot de passe
+                    _obscurePassword = !_obscurePassword;
                   });
                 },
                 icon: Icon(
-                  _obscurePassword
-                      ? Icons.visibility_off
-                      : Icons.visibility, // Icône d'œil
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  color: _accentColor,
                 ),
               ),
             ),
             onTap: () {
               setState(() {
-                _borderColor =
-                    Colors.grey; // Changer la couleur de la bordure au clic
+                _borderColor = Colors.grey;
               });
             },
             onEditingComplete: () {
               setState(() {
-                _borderColor = Colors
-                    .transparent; // Rendre la bordure invisible après l'édition
+                _borderColor = Colors.transparent;
               });
             },
           ),
-          SizedBox(
-              height:
-                  16.0), // Espacement entre le champ de mot de passe et le bouton
+          SizedBox(height: 16.0),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
@@ -255,45 +232,45 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
               child: Text(
                 'Mot de passe oublié',
                 style: TextStyle(
-                  color: Colors.green, // Couleur du texte verte
-                  fontSize: 14.0, // Taille de la police
-                  fontStyle: FontStyle.italic, // Style de police italic
+                  color: _accentColor,
+                  fontSize: 14.0,
+                  fontStyle: FontStyle.italic,
                 ),
               ),
             ),
           ),
           ElevatedButton(
             onPressed: () {
-              _signInWithEmailAndPassword(); // Appeler la fonction de connexion
+              _signInWithEmailAndPassword();
             },
-            child: Text('Se connecter'), // Texte du bouton "Se connecter"
+            child: Text(
+              'Se connecter',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             style: ButtonStyle(
               padding: MaterialStateProperty.all<EdgeInsets>(
-                EdgeInsets.symmetric(
-                    vertical: 16.0), // Espacement interne du bouton
+                EdgeInsets.symmetric(vertical: 16.0),
               ),
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(8.0), // Bord arrondi du bouton
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
-              backgroundColor: MaterialStateProperty.all<Color>(
-                Colors.grey[600]!, // Couleur de fond grise plus foncée
-              ),
+              backgroundColor: MaterialStateProperty.all<Color>(_primaryColor),
             ),
           ),
-          SizedBox(
-              height:
-                  16.0), // Espacement entre le bouton et le message d'erreur
+          SizedBox(height: 16.0),
           Container(
             alignment: Alignment.center,
             child: Text(
               _errorMessage,
               style: TextStyle(
-                color: Colors.red, // Couleur du texte d'erreur
-                fontSize: 14.0, // Taille de la police
-                fontStyle: FontStyle.italic, // Style de police italic
+                color: Colors.red,
+                fontSize: 14.0,
+                fontStyle: FontStyle.italic,
               ),
             ),
           ),
@@ -302,27 +279,21 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     );
   }
 
-  // Fonction pour hasher le mot de passe en MD5
   String _generateMD5(String input) {
     return md5.convert(utf8.encode(input)).toString();
   }
 
-  // Fonction pour vérifier les informations d'identification
   void _signInWithEmailAndPassword() async {
     try {
-      final String hashedPassword = _generateMD5(
-          _passwordController.text); // Convertir le mot de passe entré en MD5
+      final String hashedPassword = _generateMD5(_passwordController.text);
       final QuerySnapshot result = await FirebaseFirestore.instance
           .collection('personnel')
           .where('email', isEqualTo: _emailController.text)
-          .where('motDePasse',
-              isEqualTo:
-                  hashedPassword) // Comparer avec le mot de passe hashé dans la base de données
+          .where('motDePasse', isEqualTo: hashedPassword)
           .get();
       final List<DocumentSnapshot> documents = result.docs;
 
       if (documents.isNotEmpty) {
-        // Si l'utilisateur existe dans la collection personnel
         final role = documents[0]['role'];
         if (role == 'admin') {
           Navigator.push(
@@ -336,13 +307,11 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
           );
         }
       } else {
-        // Si l'utilisateur n'existe pas ou si les informations sont incorrectes
         setState(() {
           _errorMessage = 'Email ou mot de passe incorrect';
         });
       }
     } catch (e) {
-      // En cas d'erreur, afficher le message d'erreur
       setState(() {
         _errorMessage = 'Erreur de connexion: $e';
       });

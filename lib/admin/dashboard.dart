@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import '../login.dart';
-import 'grid/ajou_belle.dart'; // Importer la page ajou_belle.dart
-import '../carte.dart'; // Importer la page carte.dart
+import 'grid/ajou_belle.dart';
+import '../carte.dart';
 import 'grid/ajou_per.dart';
 import 'grid/list_perso.dart';
 import 'grid/list_pou.dart';
-import 'grid/ajou_dcht.dart'; // Importer la page ajou_dcht.dart
+import 'grid/ajou_dcht.dart';
 import 'grid/list_dcht.dart';
-import 'grid/dcht_vide.dart'; // Importer la page dcht_vide.dart
-import 'grid/dash.dart'; // Importer la page dash.dart
+import 'grid/dcht_vide.dart';
+import 'grid/dash.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -18,13 +19,22 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  Widget _currentWidget =
-      DashPage(); // Widget actuel à afficher dans le côté droit
+  Widget _currentWidget = DashPage();
 
-  @override
-  void initState() {
-    super.initState();
-    _currentWidget = DashPage(); // Initialiser avec dash.dart
+  Stream<int> _getPoubellesCount(String acces) {
+    return FirebaseFirestore.instance
+        .collection('poubelles')
+        .where('acces', isEqualTo: acces)
+        .snapshots()
+        .map((snapshot) => snapshot.size);
+  }
+
+  Stream<int> _getPersonnelCount() {
+    return FirebaseFirestore.instance
+        .collection('personnel')
+        .where('role', isEqualTo: 'personnel')
+        .snapshots()
+        .map((snapshot) => snapshot.size);
   }
 
   @override
@@ -32,7 +42,6 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
       body: Column(
         children: [
-          // En-tête avec ombre en bas
           Container(
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             decoration: BoxDecoration(
@@ -48,7 +57,6 @@ class _DashboardState extends State<Dashboard> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Titre du projet "Mo Belle" avec un padding à gauche
                 Padding(
                   padding: const EdgeInsets.only(left: 30),
                   child: Text(
@@ -67,7 +75,6 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                 ),
-                // Texte "Administrateur"
                 Text(
                   'Administrateur',
                   style: TextStyle(
@@ -76,7 +83,6 @@ class _DashboardState extends State<Dashboard> {
                     color: Colors.grey,
                   ),
                 ),
-                // Icône de déconnexion
                 IconButton(
                   icon: Icon(
                     Icons.logout,
@@ -94,7 +100,6 @@ class _DashboardState extends State<Dashboard> {
               ],
             ),
           ),
-          // Ombre gris-noir
           Container(
             height: 5,
             decoration: BoxDecoration(
@@ -111,7 +116,6 @@ class _DashboardState extends State<Dashboard> {
           Expanded(
             child: Row(
               children: [
-                // Grid à gauche
                 Expanded(
                   flex: 1,
                   child: Container(
@@ -129,120 +133,175 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                           onTap: () {
-                            // Action lorsque "Tableau de bord" est tapé
                             setState(() {
-                              _currentWidget = DashPage(); // Afficher dash.dart
+                              _currentWidget = DashPage();
                             });
                           },
                         ),
-                        ExpansionTile(
-                          leading: Icon(Icons.person),
-                          title: Text(
-                            'Personnel',
-                            style: TextStyle(
-                              fontSize: 22,
-                            ),
-                          ),
-                          tilePadding: EdgeInsets.only(left: 20),
-                          children: [
-                            ListTile(
-                              contentPadding: EdgeInsets.only(left: 40),
-                              leading: Icon(Icons.add),
+                        StreamBuilder<int>(
+                          stream: _getPersonnelCount(),
+                          builder: (context, snapshot) {
+                            final countPersonnel = snapshot.data ?? 0;
+                            return ExpansionTile(
+                              leading: Icon(Icons.person),
                               title: Text(
-                                'Ajouter du personnel',
+                                'Personnel',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 22,
                                 ),
                               ),
-                              onTap: () {
-                                // Action lorsque "Ajouter du personnel" est tapé
-                                setState(() {
-                                  _currentWidget =
-                                      AjouterPersonnelPage(); // Afficher la page ajout_personnel.dart
-                                });
-                              },
-                            ),
-                            ListTile(
-                              contentPadding: EdgeInsets.only(left: 40),
-                              leading: Icon(Icons.list),
-                              title: Text(
-                                'Liste des personnels',
-                                style: TextStyle(
-                                  fontSize: 18,
+                              tilePadding: EdgeInsets.only(left: 20),
+                              children: [
+                                ListTile(
+                                  contentPadding: EdgeInsets.only(left: 40),
+                                  leading: Icon(Icons.add),
+                                  title: Text(
+                                    'Ajouter du personnel',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      _currentWidget = AjouterPersonnelPage();
+                                    });
+                                  },
                                 ),
-                              ),
-                              onTap: () {
-                                // Action lorsque "Liste des personnels" est tapé
-                                setState(() {
-                                  _currentWidget =
-                                      ListPersonnel(); // Afficher la page liste_personnels.dart
-                                });
-                              },
-                            ),
-                          ],
+                                ListTile(
+                                  contentPadding: EdgeInsets.only(left: 40),
+                                  leading: Icon(Icons.list),
+                                  title: Row(
+                                    children: [
+                                      Text(
+                                        'Liste des personnels',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      SizedBox(width: 15),
+                                      Text(
+                                        '$countPersonnel',
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      _currentWidget = ListPersonnel();
+                                    });
+                                  },
+                                ),
+                              ],
+                            );
+                          },
                         ),
-                        ExpansionTile(
-                          leading: Icon(Icons.delete),
-                          title: Text(
-                            'Poubelle',
-                            style: TextStyle(
-                              fontSize: 22,
-                            ),
-                          ),
-                          tilePadding: EdgeInsets.only(left: 20),
-                          children: [
-                            ListTile(
-                              contentPadding: EdgeInsets.only(left: 40),
-                              leading: Icon(Icons.add),
-                              title: Text(
-                                'Ajouter des poubelles',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                ),
+                        StreamBuilder<int>(
+                          stream: _getPoubellesCount('feno'),
+                          builder: (context, snapshotFeno) {
+                            final countFeno = snapshotFeno.data ?? 0;
+                            return ExpansionTile(
+                              leading: Icon(Icons.delete),
+                              title: Row(
+                                children: [
+                                  Text(
+                                    'Poubelle',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  CircleAvatar(
+                                    radius: 6,
+                                    backgroundColor: countFeno > 0
+                                        ? Colors.red
+                                        : Colors.green,
+                                  ),
+                                ],
                               ),
-                              onTap: () {
-                                // Action lorsque "Ajouter des poubelles" est tapé
-                                setState(() {
-                                  _currentWidget =
-                                      AjoutPoubellePage(); // Afficher la page ajout_belle.dart
-                                });
-                              },
-                            ),
-                            ListTile(
-                              contentPadding: EdgeInsets.only(left: 40),
-                              leading: Icon(Icons.list),
-                              title: Text(
-                                'Tous les poubelles',
-                                style: TextStyle(
-                                  fontSize: 18,
+                              tilePadding: EdgeInsets.only(left: 20),
+                              children: [
+                                ListTile(
+                                  contentPadding: EdgeInsets.only(left: 40),
+                                  leading: Icon(Icons.add),
+                                  title: Text(
+                                    'Ajouter des poubelles',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      _currentWidget = AjoutPoubellePage();
+                                    });
+                                  },
                                 ),
-                              ),
-                              onTap: () {
-                                // Action lorsque "Tous les poubelles" est tapé
-                                setState(() {
-                                  _currentWidget =
-                                      ListPoubelles(); // Afficher la page list_pou.dart
-                                });
-                              },
-                            ),
-                            ListTile(
-                              contentPadding: EdgeInsets.only(left: 40),
-                              leading: Icon(Icons.delete_sweep),
-                              title: Text(
-                                'Poubelles à vider',
-                                style: TextStyle(
-                                  fontSize: 18,
+                                StreamBuilder<int>(
+                                  stream: _getPoubellesCount('pokaty'),
+                                  builder: (context, snapshotPokaty) {
+                                    final countPokaty =
+                                        snapshotPokaty.data ?? 0;
+                                    return ListTile(
+                                      contentPadding: EdgeInsets.only(left: 40),
+                                      leading: Icon(Icons.list),
+                                      title: Row(
+                                        children: [
+                                          Text(
+                                            'Tous les poubelles',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                          SizedBox(width: 15),
+                                          Text(
+                                            '$countPokaty',
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        setState(() {
+                                          _currentWidget = ListPoubelles();
+                                        });
+                                      },
+                                    );
+                                  },
                                 ),
-                              ),
-                              onTap: () {
-                                // Action lorsque "Poubelles à vider" est tapé
-                                setState(() {
-                                  _currentWidget =
-                                      ListPoubellesAVider(); // Afficher la page dcht_vide.dart
-                                });
-                              },
-                            ),
-                          ],
+                                ListTile(
+                                  contentPadding: EdgeInsets.only(left: 40),
+                                  leading: Icon(Icons.delete_sweep),
+                                  title: Row(
+                                    children: [
+                                      Text(
+                                        'Poubelles à vider',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      SizedBox(width: 28),
+                                      Text(
+                                        '$countFeno',
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      _currentWidget = ListPoubellesAVider();
+                                    });
+                                  },
+                                ),
+                              ],
+                            );
+                          },
                         ),
                         ExpansionTile(
                           leading: Icon(Icons.delete),
@@ -264,10 +323,8 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                               onTap: () {
-                                // Action lorsque "Ajouter un déchet" est tapé
                                 setState(() {
-                                  _currentWidget =
-                                      AjouterDechetPage(); // Afficher la page ajou_dcht.dart
+                                  _currentWidget = AjouterDechetPage();
                                 });
                               },
                             ),
@@ -281,10 +338,8 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                               onTap: () {
-                                // Action lorsque "Tous les déchets" est tapé
                                 setState(() {
-                                  _currentWidget =
-                                      ListDechets(); // Afficher la page list_dcht.dart
+                                  _currentWidget = ListDechets();
                                 });
                               },
                             ),
@@ -299,10 +354,8 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                           onTap: () {
-                            // Action lorsque "La carte" est tapée
                             setState(() {
-                              _currentWidget =
-                                  Carte(); // Afficher la page carte.dart
+                              _currentWidget = Carte();
                             });
                           },
                         ),
@@ -310,14 +363,12 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                 ),
-                // Grid à droite
                 Expanded(
                   flex: 4,
                   child: Container(
                     width: double.infinity,
                     color: Colors.white,
-                    child:
-                        _currentWidget, // Afficher le widget actuel (vide ou la page ajout_belle.dart ou la page carte.dart)
+                    child: _currentWidget,
                   ),
                 ),
               ],

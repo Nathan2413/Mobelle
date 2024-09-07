@@ -3,30 +3,42 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class DashPage extends StatelessWidget {
-  Future<Map<String, double>> getDechetStatistics(String role) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  Stream<Map<String, double>> getDechetStatistics(String role) {
+    return FirebaseFirestore.instance
         .collection('poubelles')
         .where('acces', isEqualTo: role)
-        .get();
+        .snapshots()
+        .map((querySnapshot) {
+      int totalOrganique = 0;
+      int totalChimique = 0;
 
-    int totalOrganique = 0;
-    int totalChimique = 0;
+      for (var doc in querySnapshot.docs) {
+        totalOrganique += (doc['dcht_organique'] ?? 0) as int;
+        totalChimique += (doc['dcht_chimique'] ?? 0) as int;
+      }
 
-    for (var doc in querySnapshot.docs) {
-      totalOrganique += (doc['dcht_organique'] ?? 0) as int;
-      totalChimique += (doc['dcht_chimique'] ?? 0) as int;
+      double totalDechets =
+          totalOrganique.toDouble() + totalChimique.toDouble();
+      double pourcentageOrganique = totalDechets > 0
+          ? (totalOrganique.toDouble() / totalDechets) * 100
+          : 0;
+      double pourcentageChimique = totalDechets > 0
+          ? (totalChimique.toDouble() / totalDechets) * 100
+          : 0;
+
+      return {
+        'Organique': pourcentageOrganique,
+        'Chimique': pourcentageChimique,
+      };
+    });
+  }
+
+  Stream<int> getCount(String collection, {String? field, String? isEqualTo}) {
+    Query query = FirebaseFirestore.instance.collection(collection);
+    if (field != null && isEqualTo != null) {
+      query = query.where(field, isEqualTo: isEqualTo);
     }
-
-    double totalDechets = totalOrganique.toDouble() + totalChimique.toDouble();
-    double pourcentageOrganique =
-        totalDechets > 0 ? (totalOrganique.toDouble() / totalDechets) * 100 : 0;
-    double pourcentageChimique =
-        totalDechets > 0 ? (totalChimique.toDouble() / totalDechets) * 100 : 0;
-
-    return {
-      'Organique': pourcentageOrganique,
-      'Chimique': pourcentageChimique,
-    };
+    return query.snapshots().map((snapshot) => snapshot.docs.length);
   }
 
   @override
@@ -65,8 +77,8 @@ class DashPage extends StatelessWidget {
 
   Widget buildStatCard(String title, String collection, String field,
       String value, IconData icon) {
-    return FutureBuilder<int>(
-      future: getCount(collection, field: field, isEqualTo: value),
+    return StreamBuilder<int>(
+      stream: getCount(collection, field: field, isEqualTo: value),
       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Card(
@@ -112,8 +124,8 @@ class DashPage extends StatelessWidget {
   }
 
   Widget buildPieChartWithCenterText(String title, String role) {
-    return FutureBuilder<int>(
-      future: getCount('poubelles', field: 'acces', isEqualTo: role),
+    return StreamBuilder<int>(
+      stream: getCount('poubelles', field: 'acces', isEqualTo: role),
       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Card(
@@ -124,8 +136,8 @@ class DashPage extends StatelessWidget {
             child: Center(child: Text('Erreur')),
           );
         } else {
-          return FutureBuilder<Map<String, double>>(
-            future: getDechetStatistics(role),
+          return StreamBuilder<Map<String, double>>(
+            stream: getDechetStatistics(role),
             builder: (BuildContext context,
                 AsyncSnapshot<Map<String, double>> dechetSnapshot) {
               if (dechetSnapshot.connectionState == ConnectionState.waiting) {
@@ -235,16 +247,6 @@ class DashPage extends StatelessWidget {
         }
       },
     );
-  }
-
-  Future<int> getCount(String collection,
-      {String? field, String? isEqualTo}) async {
-    Query query = FirebaseFirestore.instance.collection(collection);
-    if (field != null && isEqualTo != null) {
-      query = query.where(field, isEqualTo: isEqualTo);
-    }
-    QuerySnapshot snapshot = await query.get();
-    return snapshot.docs.length;
   }
 }
 

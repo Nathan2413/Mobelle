@@ -152,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage>
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
-                      "Une route propre ne dépend pas seulement de l'efficacité du service de nettoyage, mais aussi de l'éducation des personnes qui y passent.",
+                      "Une route propre ne dépend pas seulement de l'éfficacité du service de nettoyage, mais aussi de l'éducation des personnes qui y passent.",
                       textAlign: TextAlign.center,
                       style: isMobile
                           ? TextStyle(

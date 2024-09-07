@@ -3,30 +3,42 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class TabDashboard extends StatelessWidget {
-  Future<Map<String, double>> getDechetStatistics(String role) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  Stream<Map<String, double>> getDechetStatisticsStream(String role) {
+    return FirebaseFirestore.instance
         .collection('poubelles')
         .where('acces', isEqualTo: role)
-        .get();
+        .snapshots()
+        .map((querySnapshot) {
+      int totalOrganique = 0;
+      int totalChimique = 0;
 
-    int totalOrganique = 0;
-    int totalChimique = 0;
+      for (var doc in querySnapshot.docs) {
+        totalOrganique += (doc['dcht_organique'] ?? 0) as int;
+        totalChimique += (doc['dcht_chimique'] ?? 0) as int;
+      }
 
-    for (var doc in querySnapshot.docs) {
-      totalOrganique += (doc['dcht_organique'] ?? 0) as int;
-      totalChimique += (doc['dcht_chimique'] ?? 0) as int;
-    }
+      double totalDechets =
+          totalOrganique.toDouble() + totalChimique.toDouble();
+      double pourcentageOrganique = totalDechets > 0
+          ? (totalOrganique.toDouble() / totalDechets) * 100
+          : 0;
+      double pourcentageChimique = totalDechets > 0
+          ? (totalChimique.toDouble() / totalDechets) * 100
+          : 0;
 
-    double totalDechets = totalOrganique.toDouble() + totalChimique.toDouble();
-    double pourcentageOrganique =
-        totalDechets > 0 ? (totalOrganique.toDouble() / totalDechets) * 100 : 0;
-    double pourcentageChimique =
-        totalDechets > 0 ? (totalChimique.toDouble() / totalDechets) * 100 : 0;
+      return {
+        'Organique': pourcentageOrganique,
+        'Chimique': pourcentageChimique,
+      };
+    });
+  }
 
-    return {
-      'Organique': pourcentageOrganique,
-      'Chimique': pourcentageChimique,
-    };
+  Stream<int> getCountStream(String role) {
+    return FirebaseFirestore.instance
+        .collection('poubelles')
+        .where('acces', isEqualTo: role)
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.length);
   }
 
   @override
@@ -62,20 +74,20 @@ class TabDashboard extends StatelessWidget {
   }
 
   Widget buildPieChartWithCenterText(String title, String role) {
-    return FutureBuilder<int>(
-      future: getCount('poubelles', field: 'acces', isEqualTo: role),
-      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return StreamBuilder<int>(
+      stream: getCountStream(role),
+      builder: (BuildContext context, AsyncSnapshot<int> countSnapshot) {
+        if (countSnapshot.connectionState == ConnectionState.waiting) {
           return Card(
             child: Center(child: CircularProgressIndicator()),
           );
-        } else if (snapshot.hasError) {
+        } else if (countSnapshot.hasError) {
           return Card(
             child: Center(child: Text('Erreur')),
           );
         } else {
-          return FutureBuilder<Map<String, double>>(
-            future: getDechetStatistics(role),
+          return StreamBuilder<Map<String, double>>(
+            stream: getDechetStatisticsStream(role),
             builder: (BuildContext context,
                 AsyncSnapshot<Map<String, double>> dechetSnapshot) {
               if (dechetSnapshot.connectionState == ConnectionState.waiting) {
@@ -88,7 +100,7 @@ class TabDashboard extends StatelessWidget {
                 );
               } else {
                 var data = dechetSnapshot.data!;
-                bool isEmpty = snapshot.data == 0;
+                bool isEmpty = countSnapshot.data == 0;
                 return Card(
                   child: Column(
                     children: [
@@ -151,7 +163,7 @@ class TabDashboard extends StatelessWidget {
                             ),
                             Center(
                               child: Text(
-                                snapshot.data.toString(),
+                                countSnapshot.data.toString(),
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -191,16 +203,6 @@ class TabDashboard extends StatelessWidget {
         }
       },
     );
-  }
-
-  Future<int> getCount(String collection,
-      {String? field, String? isEqualTo}) async {
-    Query query = FirebaseFirestore.instance.collection(collection);
-    if (field != null && isEqualTo != null) {
-      query = query.where(field, isEqualTo: isEqualTo);
-    }
-    QuerySnapshot snapshot = await query.get();
-    return snapshot.docs.length;
   }
 }
 

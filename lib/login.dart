@@ -25,10 +25,13 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   late Animation<double> _imageAnimation;
   late Animation<double> _formAnimation;
 
-  final Color _primaryColor = Color(0xFF4CAF50); // Couleur verte principale
+  final Color _primaryColor =
+      Color(0xFF66BB6A); // Vert plus clair pour les éléments principaux
   final Color _accentColor =
-      Color(0xFF2E7D32); // Couleur verte foncée pour les accents
-  final Color _textColor = Colors.grey[800]!; // Couleur du texte en gris foncé
+      Color(0xFF388E3C); // Vert plus foncé pour les accents
+  final Color _textColor = Color(0xFF424242); // Gris foncé pour le texte
+  final Color _borderFocusColor =
+      Color(0xFFBDBDBD); // Gris clair pour les bordures en focus
 
   @override
   void initState() {
@@ -174,7 +177,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
             ),
             onTap: () {
               setState(() {
-                _borderColor = Colors.grey;
+                _borderColor = _borderFocusColor;
               });
             },
             onEditingComplete: () {
@@ -210,7 +213,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
             ),
             onTap: () {
               setState(() {
-                _borderColor = Colors.grey;
+                _borderColor = _borderFocusColor;
               });
             },
             onEditingComplete: () {

@@ -223,7 +223,7 @@ class _DetailsPageState extends State<DetailsPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Details',
+                  'Détails',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -547,7 +547,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     ),
                   ),
                   child: Text(
-                    'Voir les Déchets',
+                    'Voir les déchets',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

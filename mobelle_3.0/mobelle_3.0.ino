@@ -97,7 +97,7 @@ void loop() {
   if (irSensorValue == LOW) {  // Si l'infrarouge détecte un objet
     if (distance >= 2.5 && distance <= 100 && weight <= 150000) {  // Conditions pour déplacer le servo à 45 degrés et allumer la LED verte
       Serial.println("Conditions met. Servo at 45 degrees.");
-      myservo.write(45); // Déplacer le servo à 45 degrés
+      myservo.write(90); // Déplacer le servo à 45 degrés
       digitalWrite(redPin, HIGH);
       digitalWrite(greenPin, LOW);
       digitalWrite(bluePin, LOW);

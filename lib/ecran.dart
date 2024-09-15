@@ -10,40 +10,32 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mo Belle',
       theme: ThemeData(
-        // Thème de votre application
         appBarTheme: AppBarTheme(
-          backgroundColor:
-              const Color.fromARGB(0, 33, 33, 33), // Couleur de l'AppBar
-          elevation: 0, // Supprime l'ombre de l'AppBar
-          iconTheme: IconThemeData(
-              color: Colors.white), // Couleur de l'icône de l'AppBar
+          backgroundColor: const Color.fromARGB(0, 33, 33, 33),
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.white),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(
-                Colors.green), // Couleur du bouton
-            foregroundColor: MaterialStateProperty.all<Color>(
-                Colors.white), // Couleur du texte
-            textStyle: MaterialStateProperty.all<TextStyle>(
-                TextStyle(fontSize: 18.0)), // Style du texte
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
+            foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+            textStyle:
+                MaterialStateProperty.all<TextStyle>(TextStyle(fontSize: 18.0)),
             padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-              EdgeInsets.symmetric(
-                  vertical: 14.0, horizontal: 24.0), // Marge interne du bouton
+              EdgeInsets.symmetric(vertical: 14.0, horizontal: 24.0),
             ),
             shape: MaterialStateProperty.all<OutlinedBorder>(
               RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(50.0), // Bord arrondi du bouton (50%)
+                borderRadius: BorderRadius.circular(50.0),
               ),
             ),
-            shadowColor: MaterialStateProperty.all<Color>(
-                Colors.black.withOpacity(0.5)), // Couleur de l'ombre
-            elevation:
-                MaterialStateProperty.all<double>(8.0), // Élévation du bouton
+            shadowColor:
+                MaterialStateProperty.all<Color>(Colors.black.withOpacity(0.5)),
+            elevation: MaterialStateProperty.all<double>(8.0),
           ),
         ),
       ),
-      home: const MyHomePage(), // Retirez le titre de MyHomePage
+      home: const MyHomePage(),
     );
   }
 }
@@ -65,9 +57,7 @@ class _MyHomePageState extends State<MyHomePage>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(
-          milliseconds:
-              1500), // Augmenter la durée à 1500 millisecondes (1.5 secondes)
+      duration: Duration(milliseconds: 1500),
     );
     _animation = Tween<double>(
       begin: 0,
@@ -131,12 +121,29 @@ class _MyHomePageState extends State<MyHomePage>
                               ],
                             ),
                           ),
+                          // Afficher une ligne plus grande et arrondie sur mobile uniquement
+                          if (isMobile)
+                            Container(
+                              width: 80, // Largeur de la ligne
+                              height: 6, // Hauteur de la ligne
+                              margin: EdgeInsets.symmetric(vertical: 8.0),
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(
+                                    8), // Bord arrondi à 10%
+                              ),
+                            ),
+                          // Afficher une ligne arrondie sur le web
                           if ((isMobile || isWeb) && isWeb)
                             Container(
-                              width: 100,
-                              height: 10,
+                              width: 100, // Largeur de la ligne sur le web
+                              height: 10, // Hauteur de la ligne sur le web
                               margin: EdgeInsets.symmetric(vertical: 8.0),
-                              color: Colors.green,
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(
+                                    8), // Bord arrondi à 10%
+                              ),
                             ),
                         ],
                       ),
@@ -152,24 +159,19 @@ class _MyHomePageState extends State<MyHomePage>
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
-                      "Une route propre ne dépend pas seulement de l'éfficacité du service de nettoyage, mais aussi de l'éducation des personnes qui y passent.",
+                      "Une route propre ne dépend pas seulement de l'efficacité du service de nettoyage, mais aussi de l'éducation des personnes qui y passent.",
                       textAlign: TextAlign.center,
-                      style: isMobile
-                          ? TextStyle(
-                              fontSize: 25.0,
-                              color: Colors.white,
-                              fontStyle: FontStyle.italic,
-                            )
-                          : TextStyle(
-                              fontSize: isWeb ? 60.0 : 25.0,
-                              color: Colors.white,
-                            ),
+                      style: TextStyle(
+                        fontSize: isMobile ? 25.0 : (isWeb ? 60.0 : 25.0),
+                        color: Colors.white,
+                        fontStyle: FontStyle.italic, // Texte en italique
+                      ),
                     ),
                   ),
                 ),
               ),
               SizedBox(height: 60.0),
-              if (!isWeb) // Afficher le bouton uniquement si ce n'est pas sur le web
+              if (!isWeb)
                 Opacity(
                   opacity: _animation.value,
                   child: Transform.translate(
